@@ -1344,7 +1344,9 @@ button { font-family: var(--font-ui); }
   });
 
   if (!GBAuth.getPendingOrder()) {
-    runRecommendations().catch(() => {});
+    if (!GBRecommend.renderFromCache()) {
+      runRecommendations().catch(() => {});
+    }
   } else {
     document.getElementById('recsList').innerHTML =
       '<div class="rec-empty">You already submitted a book for Q2. Recommendations are locked until next quarter.</div>';

@@ -4,6 +4,26 @@
 const GBRecommend = (function () {
   const COVERS = ['cov-1', 'cov-2', 'cov-3', 'cov-4', 'cov-5'];
   const API = '/api/recommendations';
+  const CACHE_KEY = 'gb_recs_cache';
+
+  function saveCache(inputText, data) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ inputText, data, ts: Date.now() }));
+    } catch (_) {}
+  }
+
+  function loadCache() {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function clearCache() {
+    localStorage.removeItem(CACHE_KEY);
+  }
 
   function esc(s) {
     const d = document.createElement('div');
@@ -170,6 +190,7 @@ const GBRecommend = (function () {
     setLoading(true);
     try {
       const data = await fetchRecommendations(inputText, context);
+      saveCache(inputText, data);
       render(data.books, data.mode);
       return data;
     } catch (err) {
@@ -180,5 +201,22 @@ const GBRecommend = (function () {
     }
   }
 
-  return { run, render, fetchRecommendations };
+  function renderFromCache() {
+    const cached = loadCache();
+    if (!cached) return false;
+    const textarea = document.getElementById('aiTextarea');
+    if (textarea) textarea.value = cached.inputText;
+    render(cached.data.books, cached.data.mode);
+    const state = document.getElementById('aiState');
+    if (state) {
+      const age = Math.round((Date.now() - cached.ts) / 60000);
+      const label = age < 1 ? 'just now' : age < 60 ? `${age}m ago` : `${Math.round(age / 60)}h ago`;
+      state.innerHTML =
+        '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ' +
+        `${cached.data.books.length} book${cached.data.books.length !== 1 ? 's' : ''} matched · cached ${label}`;
+    }
+    return true;
+  }
+
+  return { run, render, fetchRecommendations, renderFromCache, clearCache, loadCache };
 })();
