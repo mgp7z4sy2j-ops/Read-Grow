@@ -670,61 +670,106 @@ button { font-family: var(--font-ui); }
   .quota-card { grid-column:1/-1; }
   .shelf-grid { grid-template-columns:repeat(2,1fr); }
 }
+
 @media (max-width: 860px) {
-  body { cursor:auto; }
-  .cursor, .cursor-ring { display:none; }
-  .app { flex-direction:column; }
+  /* ── 解除固定高度壳体，恢复正常文档流 ── */
+  html, body { height: auto; overflow-y: auto; }
+  body { cursor: auto; }
+  .cursor, .cursor-ring { display: none; }
+  .app { flex-direction: column; height: auto; min-height: 100dvh; overflow: visible; }
+  .main { height: auto; overflow: visible; flex: none; }
+  .content { overflow-y: visible; padding: 16px 14px 140px; flex: none; }
+
+  /* ── Sidebar → 顶部横向 tab bar ── */
   .sidebar {
-    width:100%; height:auto; flex-direction:row; flex-wrap:nowrap;
-    overflow-x:auto; padding:10px 12px;
-    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    width: 100%; height: auto; flex-direction: row;
+    position: sticky; top: 0; z-index: 20;
+    overflow-x: auto; padding: 8px 12px;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    border-right: none; border-bottom: 1px solid rgba(218,227,237,.1);
   }
-  .sidebar::-webkit-scrollbar { display:none; }
-  .sb-logo, .sb-user, .sb-quarter, .sb-footer { display:none; }
-  .sb-nav { display:flex; flex-direction:row; padding:0; gap:2px; }
-  .sb-section-label { display:none; }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .sb-logo, .sb-user, .sb-quarter, .sb-footer { display: none; }
+  .sb-nav { display: flex; flex-direction: row; flex: 1; padding: 0; gap: 2px; overflow: visible; }
+  .sb-section-label { display: none; }
   .sb-item {
-    padding:8px 14px; margin:0; border-radius:10px;
-    white-space:nowrap; font-size:13px;
+    padding: 8px 14px; margin: 0; border-radius: 8px;
+    white-space: nowrap; font-size: 13px; flex-shrink: 0;
   }
   .sb-item.active {
-    border-left:none; border-bottom:2px solid var(--cyan);
-    border-radius:0; padding-left:14px; margin-left:0;
+    border-left: none; border-bottom: 2px solid var(--cyan);
+    border-radius: 0; padding-left: 14px; margin-left: 0;
   }
-  .sb-badge, .sb-new { display:none; }
-  .topbar { padding:0 16px; height:52px; }
-  .topbar-title { font-size:18px; }
-  .topbar-quarter { display:none; }
-  .content { padding:16px 14px 120px; }
-  .quarter-row { grid-template-columns:1fr; }
-  .quota-card { grid-column:auto; }
-  .review-grid { grid-template-columns:1fr; }
-  .achievements-top { grid-template-columns:1fr; }
-  .badge-grid { grid-template-columns:repeat(2,1fr); }
-  .shelf-grid { grid-template-columns:repeat(2,1fr); }
-  .sticky-bar { left:0; padding:12px 16px; }
-  .sb-actions { gap:8px; }
-  .ceo-card { flex-direction:column; }
-  .rec-card { flex-direction:column; gap:14px; padding:16px; }
-  .rec-cover { width:100%; height:80px; min-width:unset; border-radius:10px; }
-  .rec-top { flex-wrap:wrap; gap:8px; }
-  .rec-title { font-size:17px; }
-  .rec-pct { font-size:22px; }
-  .rec-actions { flex-wrap:wrap; gap:8px; }
-  .btn-select { width:100%; justify-content:center; }
-  .ai-section { padding:16px; }
-  .ai-row { flex-direction:column; align-items:stretch; gap:10px; }
-  #aiSubmitBtn { width:100%; justify-content:center; }
+  .sb-badge, .sb-new { display: none; }
+  .sb-icon { width: 15px; height: 15px; }
+  .sb-icon svg { width: 15px; height: 15px; }
+
+  /* ── Topbar ── */
+  .topbar { padding: 0 16px; height: 52px; }
+  .tb-greeting-main { font-size: 16px; }
+  .tb-greeting-sub { display: none; }
+
+  /* ── Tab 1: This Quarter ── */
+  .quarter-row { grid-template-columns: 1fr; }
+  .quota-card { grid-column: auto; }
+  .qc-ring-svg { width: 72px; height: 72px; }
+  .qc-amount { font-size: 32px; }
+
+  /* ── AI Finder card ── */
+  .ai-card { padding: 20px 18px; }
+  .ai-card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .ai-prompt-title { font-size: 18px; }
+  .ai-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
+  #aiSubmitBtn { width: 100%; justify-content: center; }
+
+  /* ── Rec cards ── */
+  .rec-card { flex-direction: column; gap: 12px; padding: 16px; }
+  .rec-cover { width: 100%; height: 72px; min-width: unset; border-radius: 8px; }
+  .rec-top { flex-wrap: wrap; gap: 8px; }
+  .rec-title { font-size: 17px; }
+  .rec-pct { font-size: 20px; }
+  .rec-actions { flex-wrap: wrap; gap: 8px; }
+  .btn-select { width: 100%; justify-content: center; }
+  .recs-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+  /* ── Tab 2: Shelf ── */
+  .shelf-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* ── Tab 3: Community ── */
+  .ceo-card { flex-direction: column; gap: 16px; padding: 20px; }
+  .review-grid { grid-template-columns: 1fr; }
+  .community-tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .community-tabs::-webkit-scrollbar { display: none; }
+  .ctab { white-space: nowrap; flex-shrink: 0; }
+
+  /* ── Tab 4: Achievements ── */
+  .achievements-top { grid-template-columns: 1fr; }
+  .badge-grid { grid-template-columns: repeat(2, 1fr); }
+  .streak-val { font-size: 44px; }
+
+  /* ── Sticky bar ── */
+  .sticky-bar { left: 0; padding: 12px 16px; }
+  .sb-actions { gap: 8px; }
+
+  /* ── Section headers ── */
+  .section-hd { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .section-title { font-size: 22px; }
 }
+
 @media (max-width: 480px) {
-  .shelf-grid { grid-template-columns:1fr; }
-  .badge-grid { grid-template-columns:1fr; }
-  .sb-sel-book { font-size:15px; }
-  .sticky-bar { flex-direction:column; align-items:flex-start; gap:10px; }
-  .sb-actions { width:100%; }
-  .sb-actions .btn { flex:1; justify-content:center; }
-  .rec-problem { font-size:11.5px; }
-  .rec-why { font-size:13px; }
+  .content { padding: 12px 12px 140px; }
+  .shelf-grid { grid-template-columns: 1fr; }
+  .badge-grid { grid-template-columns: 1fr; }
+  .sticky-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .sb-actions { width: 100%; }
+  .sb-actions .btn { flex: 1; justify-content: center; }
+  .rec-problem { font-size: 11.5px; }
+  .rec-why { font-size: 13px; }
+  .ai-card { padding: 16px 14px; }
+  .ai-textarea { font-size: 15px; min-height: 72px; }
+  .qc-main { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .ceo-cover { width: 100%; height: 100px; min-width: unset; }
+  .lb-row { padding: 12px 14px; gap: 10px; }
 }
 </style>
 </head>
