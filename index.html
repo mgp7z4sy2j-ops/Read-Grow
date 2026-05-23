@@ -837,10 +837,29 @@
 
   @media (max-width: 640px) {
     .steps, .benefits-grid { grid-template-columns: 1fr; }
-    .hero-headline { font-size: clamp(46px, 13vw, 64px); }
-    .nav-right { gap: 8px; }
-    .nav-right .btn { padding: 9px 14px; font-size: 12.5px; }
-    .vision-inner { padding: 44px 28px; }
+    .hero-headline { font-size: clamp(42px, 12vw, 62px); }
+    .hero-body { font-size: 15px; }
+    .hero-ctas { flex-direction: column; align-items: stretch; }
+    .hero-ctas .btn { text-align: center; justify-content: center; }
+    .hero-cta-note { text-align: center; }
+    .nav-right { gap: 6px; }
+    .nav-right .btn { padding: 8px 12px; font-size: 12px; }
+    .nav-right .btn-admin-nav { display: none; }
+    .vision-inner { padding: 44px 24px; }
+    .vision-headline { font-size: clamp(32px, 9vw, 48px); }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stat-num { font-size: clamp(36px, 10vw, 52px); }
+    .section-label { font-size: 10px; }
+    .section-headline { font-size: clamp(32px, 9vw, 48px); }
+    footer { padding: 40px 20px 28px; }
+    .footer-links-group { flex-direction: column; gap: 28px; }
+    .faq-q { font-size: 14.5px; }
+  }
+  @media (max-width: 400px) {
+    .hero { padding: 72px 18px 0; }
+    .nav { padding: 0 16px; }
+    .how, .benefits, .faq, .cta, .vision { padding-left: 18px; padding-right: 18px; }
+    .nav-right .btn-ghost { display: none; }
   }
   </style>
 </head>
