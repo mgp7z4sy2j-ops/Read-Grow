@@ -2,6 +2,7 @@
   "version": 2,
   "buildCommand": "prisma generate && prisma db push --skip-generate",
   "installCommand": "npm install",
+  "outputDirectory": ".",
   "framework": null,
   "functions": {
     "api/**/*.js": {

@@ -1,8 +1,12 @@
 node_modules/
 .env
+.env.local
+.env.production
 .DS_Store
 test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
 data/orders.json
+.vercel
+.env*
