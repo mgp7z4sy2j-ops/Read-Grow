@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — STARTRADER Reading Growth Program</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+  /* ══════════════════════════════
+     TOKENS
+  ══════════════════════════════ */
+  :root {
+    --navy:        #0F1147;
+    --navy-mid:    #161B5E;
+    --cyan:        #16E9D7;
+    --cyan-dim:    #5DD8CC;
+    --amber:       #C07328;
+    --amber-deep:  #8C4E10;
+    --amber-light: #FDF2E4;
+    --gold:        #E8A83A;
+    --paper:       #FAF7F2;
+    --paper-2:     #F3EDE4;
+    --gb-ink:      #1A130C;
+    --gb-mid:      #574739;
+    --gb-light:    #9A8A78;
+    --gb-border:   #E4D9CC;
+    --error:       #D94F4F;
+    --success:     #16A97A;
+
+    --grad-hero:   linear-gradient(135deg, #1C1860 0%, #0F1147 45%, #0A0D38 100%);
+    --grad-amber:  linear-gradient(135deg, #C07328 0%, #8C4E10 100%);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui:      'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+    --ease-out:    cubic-bezier(.16,1,.3,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: var(--font-ui); overflow: hidden; cursor: none; }
+  a { text-decoration: none; color: inherit; }
+  img { display: block; max-width: 100%; }
+
+  /* ── Cursor ── */
+  .cursor {
+    position: fixed; z-index: 9999; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cyan); pointer-events: none;
+    transform: translate(-50%,-50%); mix-blend-mode: difference;
+    transition: width .2s var(--ease-out), height .2s var(--ease-out);
+  }
+  .cursor.expand { width: 34px; height: 34px; background: rgba(22,233,215,.2); }
+  .cursor-ring {
+    position: fixed; z-index: 9998; width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid rgba(22,233,215,.32); pointer-events: none;
+    transform: translate(-50%,-50%);
+  }
+
+  /* ══════════════════════════════
+     LAYOUT
+  ══════════════════════════════ */
+  .auth-wrap {
+    display: grid; grid-template-columns: 42% 58%;
+    height: 100vh;
+  }
+
+  /* ══════════════════════════════
+     LEFT PANEL
+  ══════════════════════════════ */
+  .panel-left {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(ellipse 85% 75% at 25% 45%, #242090 0%, transparent 55%),
+      radial-gradient(ellipse 65% 65% at 75% 65%, #0A2B70 0%, transparent 60%),
+      var(--grad-hero);
+    display: flex; flex-direction: column;
+    padding: 44px 48px 44px;
+  }
+
+  /* Ambient glows */
+  .pl-glow-a {
+    position: absolute; top: -8%; left: -12%;
+    width: 560px; height: 560px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,115,40,.2) 0%, transparent 60%);
+    pointer-events: none; animation: driftA 18s ease-in-out infinite;
+  }
+  .pl-glow-b {
+    position: absolute; bottom: 0; right: -8%;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(22,233,215,.1) 0%, transparent 58%);
+    pointer-events: none; animation: driftB 14s ease-in-out infinite;
+  }
+  .pl-grain {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 180px; opacity: .55; pointer-events: none;
+  }
+  .pl-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(218,227,237,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(218,227,237,.025) 1px, transparent 1px);
+    background-size: 52px 52px; pointer-events: none;
+  }
+  @keyframes driftA { 0%,100%{transform:translate(0,0)} 50%{transform:translate(24px,-16px)} }
+  @keyframes driftB { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-16px,12px)} }
+
+  /* Logo */
+  .pl-logo { position: relative; z-index: 2; }
+  .pl-logo img { height: 44px; width: auto; }
+  .pl-logo-back {
+    display: inline-flex; align-items: center; gap: 7px; margin-top: 10px;
+    font-family: var(--font-ui); font-size: 12px; color: rgba(218,227,237,.4);
+    transition: color .2s;
+  }
+  .pl-logo-back:hover { color: rgba(218,227,237,.7); }
+  .pl-logo-back svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* Main copy */
+  .pl-copy {
+    position: relative; z-index: 2;
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: 32px 0 24px;
+  }
+  .pl-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 13px 5px 9px;
+    background: rgba(22,233,215,.07); border: 1px solid rgba(22,233,215,.16);
+    border-radius: 99px; margin-bottom: 28px;
+    font-family: var(--font-ui); font-size: 11px; font-weight: 500; color: var(--cyan); letter-spacing: .06em;
+  }
+  .pl-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 7px var(--cyan); animation: pulse 2.4s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+
+  .pl-title {
+    font-family: var(--font-display); font-size: clamp(44px, 4.2vw, 62px); font-weight: 700;
+    line-height: 1.02; color: #fff; margin-bottom: 20px;
+  }
+  .pl-title em { color: var(--gold); font-style: italic; display: block; }
+  .pl-sub {
+    font-family: var(--font-body); font-size: 15px; font-weight: 300; line-height: 1.75;
+    color: rgba(218,227,237,.62); max-width: 320px;
+  }
+
+  /* Info card */
+  .pl-card {
+    position: relative; z-index: 2;
+    background: rgba(14,16,34,.75);
+    border: 1px solid rgba(218,227,237,.1); border-radius: 18px;
+    padding: 22px 24px; margin-bottom: 32px;
+    backdrop-filter: blur(24px);
+    box-shadow: 0 24px 56px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+    animation: floatCard 9s ease-in-out infinite;
+  }
+  @keyframes floatCard { 0%,100%{transform:translateY(0) rotate(-.2deg)} 50%{transform:translateY(-10px) rotate(.2deg)} }
+
+  .pl-card-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+  }
+  .pl-card-badge {
+    font-family: var(--font-ui); font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .12em;
+    background: var(--cyan); color: var(--navy); padding: 3px 10px; border-radius: 99px;
+  }
+  .pl-card-quarter { font-family: var(--font-ui); font-size: 11px; color: rgba(218,227,237,.36); }
+  .pl-card-divider { height: 1px; background: rgba(218,227,237,.07); margin-bottom: 16px; }
+  .pl-card-rows { display: flex; flex-direction: column; gap: 10px; }
+  .pl-card-row { display: flex; align-items: center; gap: 10px; }
+  .pl-card-ico {
+    width: 28px; height: 28px; border-radius: 8px; background: rgba(22,233,215,.08);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .pl-card-ico svg { width: 13px; height: 13px; stroke: var(--cyan); fill: none; stroke-width: 2; }
+  .pl-card-text { font-family: var(--font-ui); font-size: 12.5px; color: rgba(218,227,237,.72); }
+  .pl-card-text strong { color: #fff; }
+
+  /* Tagline */
+  .pl-tagline {
+    position: relative; z-index: 2;
+    font-family: var(--font-display); font-style: italic; font-size: 13px;
+    color: rgba(218,227,237,.2);
+  }
+
+  /* ══════════════════════════════
+     RIGHT PANEL
+  ══════════════════════════════ */
+  .panel-right {
+    background: var(--paper);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+  .pr-inner {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 48px;
+  }
+  .pr-form-wrap { width: 100%; max-width: 420px; }
+
+  /* Breadcrumb */
+  .pr-breadcrumb {
+    font-family: var(--font-ui); font-size: 12px; color: var(--gb-light);
+    margin-bottom: 36px; display: flex; align-items: center; gap: 8px;
+  }
+  .pr-breadcrumb a { color: var(--amber); transition: color .15s; }
+  .pr-breadcrumb a:hover { color: var(--amber-deep); }
+  .pr-breadcrumb-sep { color: var(--gb-border); }
+
+  /* Form heading */
+  .pr-title {
+    font-family: var(--font-display); font-size: 36px; font-weight: 700;
+    color: var(--gb-ink); line-height: 1.1; margin-bottom: 8px;
+  }
+  .pr-sub {
+    font-family: var(--font-body); font-size: 14.5px; font-weight: 300;
+    color: var(--gb-light); margin-bottom: 36px; line-height: 1.6;
+  }
+
+  /* Fields */
+  .field { margin-bottom: 20px; }
+  .field-label {
+    display: block; margin-bottom: 7px;
+    font-family: var(--font-ui); font-size: 13px; font-weight: 600;
+    color: var(--gb-mid); letter-spacing: .02em;
+  }
+  .field-input-wrap { position: relative; }
+  .field-input {
+    width: 100%; padding: 13px 16px;
+    background: #fff; color: var(--gb-ink);
+    border: 1.5px solid var(--gb-border);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    font-family: var(--font-ui); font-size: 15px;
+    transition: border-color .2s, box-shadow .2s, border-left-color .2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .field-input::placeholder { color: var(--gb-light); }
+  .field-input:focus {
+    border-color: rgba(192,115,40,.4);
+    border-left-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(192,115,40,.08);
+  }
+  .field-input.has-value { border-left-color: var(--cyan-dim); }
+  .field-input.error {
+    border-color: rgba(217,79,79,.3);
+    border-left-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(217,79,79,.08);
+  }
+  .field-input.valid {
+    border-left-color: var(--success);
+  }
+
+  /* Password toggle */
+  .field-input.has-toggle { padding-right: 44px; }
+  .toggle-btn {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: none; padding: 4px;
+    color: var(--gb-light); transition: color .2s;
+    display: flex; align-items: center;
+  }
+  .toggle-btn:hover { color: var(--gb-mid); }
+  .toggle-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+
+  /* Inline error */
+  .field-error {
+    font-family: var(--font-ui); font-size: 12px; color: var(--error);
+    margin-top: 5px; overflow: hidden; max-height: 0;
+    transition: max-height .25s var(--ease-out), opacity .25s;
+    opacity: 0; padding-left: 2px;
+  }
+  .field-error.show { max-height: 24px; opacity: 1; }
+
+  /* Remember + forgot row */
+  .form-meta-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .check-label {
+    display: flex; align-items: center; gap: 9px; cursor: none;
+    font-family: var(--font-ui); font-size: 13.5px; color: var(--gb-mid);
+    user-select: none;
+  }
+  .check-box {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--gb-border); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: border-color .2s, background .2s;
+  }
+  .check-box svg { width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2.5; opacity: 0; transition: opacity .15s; }
+  .check-label input { display: none; }
+  .check-label input:checked + .check-box { background: var(--amber); border-color: var(--amber); }
+  .check-label input:checked + .check-box svg { opacity: 1; }
+  .forgot-link {
+    font-family: var(--font-ui); font-size: 13.5px; font-weight: 500;
+    color: var(--amber); transition: color .15s;
+  }
+  .forgot-link:hover { color: var(--amber-deep); }
+
+  /* Submit button */
+  .btn-submit {
+    width: 100%; padding: 15px 24px;
+    background: var(--grad-amber); color: #fff;
+    border: none; border-radius: 10px;
+    font-family: var(--font-ui); font-size: 15px; font-weight: 600;
+    cursor: none; position: relative; overflow: hidden;
+    transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out), opacity .2s;
+    box-shadow: 0 4px 16px rgba(192,115,40,.25);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 24px;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(192,115,40,.36); }
+  .btn-submit:active { transform: scale(.97); }
+  .btn-submit::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+    transform: skewX(-15deg);
+    transition: left .55s var(--ease-out);
+  }
+  .btn-submit:hover::after { left: 150%; }
+  .btn-submit:disabled { opacity: .65; transform: none; cursor: not-allowed; }
+  .btn-submit .spin {
+    width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.35);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin .7s linear infinite; display: none;
+  }
+  .btn-submit.loading .btn-text { display: none; }
+  .btn-submit.loading .spin { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Ripple */
+  .ripple {
+    position: absolute; border-radius: 50%; transform: scale(0);
+    background: rgba(255,255,255,.25); animation: rippleOut .55s var(--ease-out) forwards;
+    pointer-events: none;
+  }
+  @keyframes rippleOut { to { transform: scale(4); opacity: 0; } }
+
+  /* Divider */
+  .form-divider {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 24px;
+  }
+  .form-divider-line { flex: 1; height: 1px; background: var(--gb-border); }
+  .form-divider-text {
+    font-family: var(--font-ui); font-size: 12px; color: var(--gb-light); white-space: nowrap;
+  }
+
+  /* Switch link */
+  .form-switch {
+    text-align: center;
+    font-family: var(--font-ui); font-size: 14px; color: var(--gb-mid);
+  }
+  .form-switch a {
+    color: var(--amber); font-weight: 600; margin-left: 4px;
+    transition: color .15s;
+  }
+  .form-switch a:hover { color: var(--amber-deep); }
+
+  /* Stagger enter animation */
+  .pr-form-wrap > * {
+    opacity: 0; transform: translateY(18px);
+    animation: fadeUp .6s var(--ease-out) forwards;
+  }
+  .pr-breadcrumb  { animation-delay: .08s; }
+  .pr-title       { animation-delay: .16s; }
+  .pr-sub         { animation-delay: .22s; }
+  .field:nth-child(1) { animation-delay: .28s; }
+  .field:nth-child(2) { animation-delay: .34s; }
+  .form-meta-row  { animation-delay: .40s; }
+  .btn-submit     { animation-delay: .46s; }
+  .form-divider   { animation-delay: .52s; }
+  .form-switch    { animation-delay: .56s; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  /* ══════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════ */
+  @media (max-width: 900px) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+    .auth-wrap { grid-template-columns: 1fr; }
+    .panel-left { display: none; }
+    .panel-right { min-height: 100vh; }
+    .pr-inner { justify-content: flex-start; padding-top: 48px; }
+    .pr-form-wrap::before {
+      content: '';
+      display: block;
+      height: 48px; width: 180px;
+      background: url('./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_RGB.png') left center / contain no-repeat;
+      margin-bottom: 32px;
+    }
+  }
+  @media (max-width: 600px) {
+    .pr-inner { padding: 40px 24px; }
+  }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+<div class="auth-wrap">
+
+  <!-- ══ LEFT PANEL ══ -->
+  <div class="panel-left" aria-hidden="true">
+    <div class="pl-glow-a"></div>
+    <div class="pl-glow-b"></div>
+    <div class="pl-grain"></div>
+    <div class="pl-grid"></div>
+
+    <div class="pl-logo">
+      <img src="./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_Inverted_RGB.png" alt="STARTRADER" height="44">
+      <a href="./index.html" class="pl-logo-back">
+        <svg viewBox="0 0 12 12"><path d="M8 2L4 6l4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to home
+      </a>
+    </div>
+
+    <div class="pl-copy">
+      <div class="pl-pill">
+        <span class="pl-pill-dot"></span>
+        Reading Growth Program
+      </div>
+      <h1 class="pl-title">
+        Welcome
+        <em>back.</em>
+      </h1>
+      <p class="pl-sub">Your next great read is one quarter away. Sign in to continue your journey.</p>
+    </div>
+
+    <div class="pl-card">
+      <div class="pl-card-header">
+        <span class="pl-card-badge">Q2 OPEN</span>
+        <span class="pl-card-quarter">Apr – Jun 2026</span>
+      </div>
+      <div class="pl-card-divider"></div>
+      <div class="pl-card-rows">
+        <div class="pl-card-row">
+          <div class="pl-card-ico">
+            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          </div>
+          <span class="pl-card-text"><strong>$80</strong> quarterly book budget</span>
+        </div>
+        <div class="pl-card-row">
+          <div class="pl-card-ico">
+            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <span class="pl-card-text"><strong>2,000+</strong> curated titles</span>
+        </div>
+        <div class="pl-card-row">
+          <div class="pl-card-ico">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <span class="pl-card-text">AI-matched in <strong>seconds</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <p class="pl-tagline">One Book. One Quarter. One Step Forward.</p>
+  </div>
+
+  <!-- ══ RIGHT PANEL ══ -->
+  <div class="panel-right">
+    <div class="pr-inner">
+      <div class="pr-form-wrap">
+
+        <div class="pr-breadcrumb">
+          <a href="./index.html">STARTRADER Reading Growth Program</a>
+          <span class="pr-breadcrumb-sep">/</span>
+          Sign in
+        </div>
+
+        <h1 class="pr-title">Sign in to your account</h1>
+        <p class="pr-sub">Use your @startrader.com or @starprime.com email.</p>
+
+        <form id="loginForm" novalidate>
+
+          <div class="field">
+            <label class="field-label" for="email">Work Email</label>
+            <div class="field-input-wrap">
+              <input
+                class="field-input" id="email" name="email"
+                type="email" autocomplete="email"
+                placeholder="you@startrader.com"
+              >
+            </div>
+            <p class="field-error" id="email-error">Please use your @startrader.com or @starprime.com email.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="password">Password</label>
+            <div class="field-input-wrap">
+              <input
+                class="field-input has-toggle" id="password" name="password"
+                type="password" autocomplete="current-password"
+                placeholder="Your password"
+              >
+              <button type="button" class="toggle-btn" id="togglePwd" aria-label="Show password">
+                <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <p class="field-error" id="pwd-error">Password is required.</p>
+          </div>
+
+          <div class="form-meta-row">
+            <label class="check-label">
+              <input type="checkbox" name="remember">
+              <span class="check-box">
+                <svg viewBox="0 0 10 10"><polyline points="1.5 5 4 7.5 8.5 2.5"/></svg>
+              </span>
+              Remember me
+            </label>
+            <a href="#" class="forgot-link">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span class="btn-text">Sign in</span>
+            <span class="spin"></span>
+          </button>
+
+        </form>
+
+        <div class="form-divider">
+          <div class="form-divider-line"></div>
+          <span class="form-divider-text">or</span>
+          <div class="form-divider-line"></div>
+        </div>
+
+        <p class="form-switch">
+          New to the program?
+          <a href="./register.html">Create account →</a>
+        </p>
+        <p class="form-switch" style="margin-top:8px;font-size:12px">
+          HR administrator?
+          <a href="./admin-login.html">Admin portal →</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="./auth.js"></script>
+<script>
+  GBAuth.redirectIfAuthed();
+  // ── Cursor
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+  });
+  (function tick() { rx += (mx-rx)*.12; ry += (my-ry)*.12; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(tick); })();
+  document.querySelectorAll('a, button, .check-label').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+  });
+
+  // ── Input live state
+  function setInputState(input, state) {
+    input.classList.remove('has-value', 'error', 'valid');
+    if (state) input.classList.add(state);
+  }
+  document.querySelectorAll('.field-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      if (inp.value) setInputState(inp, 'has-value');
+      else setInputState(inp, '');
+    });
+  });
+
+  // ── Email domain check on blur
+  const emailInp  = document.getElementById('email');
+  const emailErr  = document.getElementById('email-error');
+  const validDomains = GBAuth.VALID_DOMAINS;
+  emailInp.addEventListener('blur', () => {
+    if (!emailInp.value) return;
+    const domain = emailInp.value.split('@')[1];
+    if (!domain || !validDomains.includes(domain.toLowerCase())) {
+      setInputState(emailInp, 'error');
+      emailErr.classList.add('show');
+    } else {
+      setInputState(emailInp, 'valid');
+      emailErr.classList.remove('show');
+    }
+  });
+  emailInp.addEventListener('focus', () => emailErr.classList.remove('show'));
+
+  // ── Password toggle
+  const pwdInp  = document.getElementById('password');
+  const toggleBtn = document.getElementById('togglePwd');
+  const eyeIcon   = document.getElementById('eyeIcon');
+  const eyeOpen   = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  const eyeOff    = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+  let pwdVisible = false;
+  toggleBtn.addEventListener('click', () => {
+    pwdVisible = !pwdVisible;
+    pwdInp.type = pwdVisible ? 'text' : 'password';
+    eyeIcon.innerHTML = pwdVisible ? eyeOff : eyeOpen;
+  });
+
+  // ── Ripple on submit btn
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.addEventListener('click', e => {
+    const r = document.createElement('span');
+    const rect = submitBtn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 1.5;
+    r.className = 'ripple';
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    submitBtn.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+  });
+
+  // ── Form submit (demo)
+  document.getElementById('loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    let valid = true;
+    const pwdErr = document.getElementById('pwd-error');
+
+    if (!emailInp.value || !validDomains.includes((emailInp.value.split('@')[1]||'').toLowerCase())) {
+      setInputState(emailInp, 'error');
+      emailErr.classList.add('show');
+      valid = false;
+    }
+    if (!pwdInp.value) {
+      setInputState(pwdInp, 'error');
+      pwdErr.classList.add('show');
+      valid = false;
+    } else {
+      pwdErr.classList.remove('show');
+    }
+    if (!valid) return;
+
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    setTimeout(() => {
+      const user = GBAuth.buildUserFromLogin(emailInp.value);
+      GBAuth.saveSession(user);
+      window.location.href = './dashboard.html';
+    }, 800);
+  });
+
+  // ── Checkbox click area
+  document.querySelectorAll('.check-label').forEach(lbl => {
+    lbl.addEventListener('click', e => {
+      if (e.target.tagName === 'INPUT') return;
+      const inp = lbl.querySelector('input');
+      inp.checked = !inp.checked;
+    });
+  });
+</script>
+</body>
+</html>

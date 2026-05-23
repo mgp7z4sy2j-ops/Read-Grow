@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal — STARTRADER Reading Growth Program</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@0,300;0,400&display=swap" rel="stylesheet">
+  <style>
+  /* ══════════════════════════════
+     TOKENS — Light blue admin theme
+  ══════════════════════════════ */
+  :root {
+    --navy:       #1E3A8A;
+    --navy-deep:  #1E40AF;
+    --navy-card:  #FFFFFF;
+    --navy-input: #FFFFFF;
+    --blue:       #2563EB;
+    --blue-d:     #1D4ED8;
+    --blue-light: #DBEAFE;
+    --blue-soft:  #EFF6FF;
+    --sky:        #0EA5E9;
+    --sky-d:      #0284C7;
+    --cyan:       #2563EB;
+    --cyan-dim:   #3B82F6;
+    --cyan-10:    rgba(37,99,235,.10);
+    --cyan-18:    rgba(37,99,235,.20);
+    --ink:        #1E3A5F;
+    --graphite:   #475569;
+    --mist:       #64748B;
+    --mist-06:    rgba(37,99,235,.06);
+    --mist-10:    rgba(37,99,235,.12);
+    --mist-18:    rgba(37,99,235,.18);
+    --mist-35:    #64748B;
+    --mist-55:    #475569;
+    --error:      #DC2626;
+    --warn:       #D97706;
+
+    --grad-bg:    linear-gradient(160deg, #EFF6FF 0%, #F0F9FF 45%, #E0F2FE 100%);
+    --grad-trust: linear-gradient(180deg, #DBEAFE 0%, #EFF6FF 100%);
+    --grad-cyan:  linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui:      'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+    --ease-out:    cubic-bezier(.16,1,.3,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font-ui);
+    background: var(--grad-bg);
+    color: var(--ink);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    cursor: none;
+  }
+  a { text-decoration: none; color: inherit; }
+  img { display: block; max-width: 100%; }
+
+  /* ══════════════════════════════
+     CURSOR
+  ══════════════════════════════ */
+  .cursor {
+    position: fixed; z-index: 9999;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--blue); pointer-events: none;
+    transform: translate(-50%,-50%);
+    transition: width .18s var(--ease-out), height .18s var(--ease-out), background .18s;
+  }
+  .cursor.expand { width: 30px; height: 30px; background: rgba(37,99,235,.14); }
+  .cursor-ring {
+    position: fixed; z-index: 9998;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 1px solid rgba(37,99,235,.28);
+    pointer-events: none; transform: translate(-50%,-50%);
+  }
+
+  /* ══════════════════════════════
+     BACKGROUND LAYERS
+  ══════════════════════════════ */
+  .bg-wrap {
+    position: fixed; inset: 0; pointer-events: none; overflow: hidden;
+  }
+
+  /* Ambient orbs */
+  .orb {
+    position: absolute; border-radius: 50%; pointer-events: none;
+  }
+  .orb-1 {
+    width: 700px; height: 700px;
+    top: -20%; left: -12%;
+    background: radial-gradient(circle, rgba(37,99,235,.14) 0%, transparent 62%);
+    animation: drift1 22s ease-in-out infinite;
+  }
+  .orb-2 {
+    width: 500px; height: 500px;
+    bottom: -10%; right: -8%;
+    background: radial-gradient(circle, rgba(14,165,233,.12) 0%, transparent 58%);
+    animation: drift2 18s ease-in-out infinite;
+  }
+  .orb-3 {
+    width: 360px; height: 360px;
+    top: 40%; left: 55%;
+    background: radial-gradient(circle, rgba(59,130,246,.10) 0%, transparent 60%);
+    animation: drift3 14s ease-in-out infinite;
+  }
+  @keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,-24px)} }
+  @keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-22px,18px)} }
+  @keyframes drift3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-18px,-14px)} }
+
+  /* Grid */
+  .bg-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--mist-06) 1px, transparent 1px),
+      linear-gradient(90deg, var(--mist-06) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  /* Grain */
+  .bg-grain {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 180px; opacity: .5;
+  }
+  /* Vignette */
+  .bg-vignette {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 55%, rgba(191,219,254,.35) 100%);
+  }
+
+  .bg-scan {
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(37,99,235,.015) 3px,
+      rgba(37,99,235,.015) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* ══════════════════════════════
+     LAYOUT
+  ══════════════════════════════ */
+  .page {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 24px;
+  }
+
+  /* ══════════════════════════════
+     CARD
+  ══════════════════════════════ */
+  .card {
+    width: 100%; max-width: 460px;
+    background: rgba(255,255,255,.92);
+    border: 1px solid var(--mist-10);
+    border-radius: 24px;
+    backdrop-filter: blur(36px) saturate(1.4);
+    box-shadow:
+      0 24px 64px rgba(37,99,235,.12),
+      0 0 0 1px rgba(255,255,255,.8),
+      inset 0 1px 0 rgba(255,255,255,.9);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: cardIn .8s var(--ease-out) forwards;
+    animation-delay: .1s;
+  }
+  @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
+
+  /* Top accent bar */
+  .card-accent {
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, var(--blue) 40%, var(--sky) 70%, transparent 100%);
+    opacity: .85;
+  }
+
+  .card-inner { padding: 40px 44px 44px; }
+
+  /* ── Card header ── */
+  .card-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 32px;
+  }
+  .card-logo img { height: 36px; width: auto; }
+  .admin-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px 5px 9px;
+    background: var(--cyan-10); border: 1px solid var(--cyan-18);
+    border-radius: 99px;
+    font-family: var(--font-ui); font-size: 10.5px; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--blue-d);
+    opacity: 0; animation: cardIn .6s var(--ease-out) forwards; animation-delay: .35s;
+  }
+  .admin-badge-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--blue); box-shadow: 0 0 6px rgba(37,99,235,.45);
+    animation: pulse 2.4s ease infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+
+  /* ── Heading ── */
+  .card-title {
+    font-family: var(--font-display); font-size: 30px; font-weight: 700;
+    color: var(--ink); line-height: 1.1; margin-bottom: 8px;
+    opacity: 0; animation: cardIn .6s var(--ease-out) forwards; animation-delay: .22s;
+  }
+  .card-sub {
+    font-family: var(--font-ui); font-size: 13px; font-weight: 400;
+    color: var(--mist-35); line-height: 1.65; margin-bottom: 32px;
+    opacity: 0; animation: cardIn .6s var(--ease-out) forwards; animation-delay: .28s;
+  }
+
+  .security-notice {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(37,99,235,.06); border: 1px solid rgba(37,99,235,.14);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 28px;
+    opacity: 0; animation: cardIn .6s var(--ease-out) forwards; animation-delay: .32s;
+  }
+  .security-notice svg { width: 15px; height: 15px; stroke: var(--blue); fill: none; stroke-width: 1.75; flex-shrink: 0; margin-top: 1px; }
+  .security-notice-text { font-family: var(--font-ui); font-size: 12px; color: var(--mist-35); line-height: 1.6; }
+  .security-notice-text strong { color: var(--blue-d); font-weight: 600; }
+
+  /* ── Form ── */
+  .form { opacity: 0; animation: cardIn .6s var(--ease-out) forwards; animation-delay: .38s; }
+
+  .field { margin-bottom: 18px; }
+  .field-label {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 7px;
+    font-family: var(--font-ui); font-size: 12.5px; font-weight: 600;
+    color: var(--mist-55); letter-spacing: .03em;
+  }
+  .field-label a { color: var(--blue); font-weight: 500; transition: color .15s; font-size: 12px; }
+  .field-label a:hover { color: var(--blue-d); }
+
+  .field-input-wrap { position: relative; }
+  .field-input {
+    width: 100%; padding: 13px 16px;
+    background: var(--navy-input);
+    color: var(--ink);
+    border: 1.5px solid var(--mist-10);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    font-family: var(--font-ui); font-size: 14.5px;
+    transition: border-color .2s, border-left-color .22s, box-shadow .22s, background .2s;
+    outline: none; -webkit-appearance: none;
+  }
+  .field-input::placeholder { color: #94A3B8; }
+  .field-input:focus {
+    background: #FFFFFF;
+    border-color: var(--mist-18);
+    border-left-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.12), inset 0 0 0 1px rgba(37,99,235,.04);
+  }
+  .field-input.has-value { border-left-color: rgba(37,99,235,.45); }
+  .field-input.error {
+    border-left-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(217,79,79,.08);
+  }
+
+  /* Password toggle */
+  .field-input.has-toggle { padding-right: 46px; }
+  .toggle-btn {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: none; padding: 5px;
+    color: #94A3B8; transition: color .18s; display: flex; align-items: center;
+  }
+  .toggle-btn:hover { color: var(--mist-55); }
+  .toggle-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+
+  /* Error message */
+  .field-error {
+    font-family: var(--font-ui); font-size: 12px; color: var(--error);
+    margin-top: 5px; max-height: 0; overflow: hidden;
+    transition: max-height .25s var(--ease-out), opacity .25s; opacity: 0; padding-left: 2px;
+  }
+  .field-error.show { max-height: 24px; opacity: 1; }
+
+  /* Global error */
+  .form-error {
+    background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.22);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;
+    font-family: var(--font-ui); font-size: 13px; color: #B91C1C;
+    display: flex; align-items: center; gap: 9px;
+    max-height: 0; overflow: hidden; opacity: 0;
+    transition: max-height .35s var(--ease-out), opacity .3s, padding .3s;
+  }
+  .form-error.show { max-height: 60px; opacity: 1; padding: 12px 16px; }
+  .form-error svg { width: 15px; height: 15px; stroke: #B91C1C; fill: none; stroke-width: 2; flex-shrink: 0; }
+
+  /* ── Remember row ── */
+  .form-meta-row {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 12px; margin-bottom: 26px;
+  }
+  .check-label {
+    display: flex; align-items: flex-start; gap: 9px; cursor: none;
+    font-family: var(--font-ui); font-size: 13px; color: var(--mist-35);
+    user-select: none; line-height: 1.5;
+  }
+  .check-box {
+    width: 17px; height: 17px; border-radius: 5px; flex-shrink: 0; margin-top: 1px;
+    border: 1.5px solid var(--mist-18); background: #F8FAFC;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s, background .2s;
+  }
+  .check-box svg { width: 9px; height: 9px; stroke: #fff; fill: none; stroke-width: 2.5; opacity: 0; transition: opacity .15s; }
+  .check-label input { display: none; }
+  .check-label input:checked + .check-box { background: var(--blue); border-color: var(--blue); }
+  .check-label input:checked + .check-box svg { opacity: 1; }
+  .check-sub { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+
+  .btn-submit {
+    width: 100%; padding: 14px 24px;
+    background: var(--grad-cyan); color: #fff;
+    border: none; border-radius: 10px;
+    font-family: var(--font-ui); font-size: 15px; font-weight: 700;
+    cursor: none; position: relative; overflow: hidden;
+    transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out), opacity .2s;
+    box-shadow: 0 4px 16px rgba(37,99,235,.28);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: .01em;
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(37,99,235,.32);
+  }
+  .btn-submit:active { transform: scale(.97); }
+  .btn-submit::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+    transform: skewX(-15deg);
+    transition: left .55s var(--ease-out); pointer-events: none;
+  }
+  .btn-submit:hover::after { left: 150%; }
+  .btn-submit:disabled { opacity: .55; transform: none; }
+
+  .btn-submit .spin {
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,.35); border-top-color: #fff;
+    border-radius: 50%; animation: spin .7s linear infinite; display: none;
+  }
+  .btn-submit.loading .btn-text { display: none; }
+  .btn-submit.loading .spin { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ripple {
+    position: absolute; border-radius: 50%; transform: scale(0);
+    background: rgba(13,13,75,.2); animation: rippleOut .55s var(--ease-out) forwards; pointer-events: none;
+  }
+  @keyframes rippleOut { to { transform: scale(4); opacity: 0; } }
+
+  /* ── Footer ── */
+  .card-footer {
+    border-top: 1px solid var(--mist-06); margin-top: 24px; padding-top: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    opacity: 0; animation: cardIn .6s var(--ease-out) forwards; animation-delay: .5s;
+  }
+  .footer-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-ui); font-size: 12.5px; color: var(--mist-35);
+    transition: color .15s;
+  }
+  .footer-link:hover { color: var(--blue-d); }
+  .footer-link svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .footer-monitored {
+    font-family: var(--font-ui); font-size: 11px; color: #94A3B8;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .footer-monitored svg { width: 11px; height: 11px; stroke: rgba(37,99,235,.45); fill: none; stroke-width: 2; }
+
+  .page-footer {
+    margin-top: 28px; text-align: center;
+    opacity: 0; animation: cardIn .6s var(--ease-out) forwards; animation-delay: .6s;
+  }
+  .page-footer p {
+    font-family: var(--font-ui); font-size: 11.5px; color: #94A3B8;
+    line-height: 1.6;
+  }
+  .page-footer a { color: var(--blue); transition: color .15s; }
+  .page-footer a:hover { color: var(--blue-d); }
+
+  /* ══════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════ */
+  @media (max-width: 520px) {
+    body { cursor: auto; overflow-y: auto; }
+    .cursor, .cursor-ring { display: none; }
+    .card-inner { padding: 32px 28px 36px; }
+    .page { padding: 32px 16px; }
+  }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Background layers -->
+<div class="bg-wrap">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-scan"></div>
+  <div class="bg-grain"></div>
+  <div class="bg-vignette"></div>
+</div>
+
+<div class="page">
+
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-inner">
+
+      <!-- Header -->
+      <div class="card-header">
+        <div class="card-logo">
+          <img
+            src="./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_RGB.png"
+            alt="STARTRADER"
+            height="36"
+          >
+        </div>
+        <div class="admin-badge">
+          <span class="admin-badge-dot"></span>
+          Admin Portal
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h1 class="card-title">HR Administration<br>Dashboard</h1>
+      <p class="card-sub">Restricted access · IT-provisioned accounts only.<br>Unauthorized access is prohibited and monitored.</p>
+
+      <!-- Security notice -->
+      <div class="security-notice">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p class="security-notice-text">
+          <strong>Admin accounts are not self-registerable.</strong>
+          Contact your IT administrator to request access. All login activity is logged with timestamp and IP.
+        </p>
+      </div>
+
+      <!-- Form -->
+      <form class="form" id="adminForm" novalidate>
+
+        <!-- Global error -->
+        <div class="form-error" id="formError">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Incorrect email or password. Please try again.
+        </div>
+
+        <!-- Email -->
+        <div class="field">
+          <label class="field-label" for="email">Admin Email</label>
+          <div class="field-input-wrap">
+            <input
+              class="field-input" id="email" name="email"
+              type="email" autocomplete="email"
+              placeholder="admin@startrader.com"
+            >
+          </div>
+          <p class="field-error" id="email-error">A valid email address is required.</p>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <label class="field-label" for="password">
+            Password
+            <a href="#">Forgot password?</a>
+          </label>
+          <div class="field-input-wrap">
+            <input
+              class="field-input has-toggle" id="password" name="password"
+              type="password" autocomplete="current-password"
+              placeholder="••••••••••••"
+            >
+            <button type="button" class="toggle-btn" id="togglePwd" aria-label="Show password">
+              <svg id="eyeIcon" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <p class="field-error" id="pwd-error">Password is required.</p>
+        </div>
+
+        <!-- Stay signed in -->
+        <div class="form-meta-row">
+          <label class="check-label">
+            <input type="checkbox" name="stay" id="stayCheck">
+            <span class="check-box">
+              <svg viewBox="0 0 10 10"><polyline points="1.5 5 4 7.5 8.5 2.5"/></svg>
+            </span>
+            <div>
+              Stay signed in
+              <div class="check-sub">Session only by default. Only enable on secure devices.</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">
+            Sign in to Admin Portal
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-left:4px"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+          <span class="spin"></span>
+        </button>
+
+        <!-- Footer -->
+        <div class="card-footer">
+          <a href="./index.html" class="footer-link">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to main site
+          </a>
+          <div class="footer-monitored">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            All actions logged
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Bottom note -->
+  <div class="page-footer">
+    <p>
+      STARTRADER Reading Growth Program · Admin Portal<br>
+      Need access? Contact <a href="#">IT Administration</a> · <a href="./login.html">Employee login →</a>
+    </p>
+  </div>
+
+</div>
+
+<script src="./auth.js"></script>
+<script>
+  if (localStorage.getItem('gb_admin_session')) {
+    window.location.replace('./admin-dashboard.html');
+  }
+  // ── Cursor
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+  });
+  (function tick() {
+    rx += (mx - rx) * .12; ry += (my - ry) * .12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(tick);
+  })();
+  document.querySelectorAll('a, button, .check-label').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+  });
+
+  // ── Input state
+  function setState(inp, state) {
+    inp.classList.remove('has-value', 'error');
+    if (state) inp.classList.add(state);
+  }
+  document.querySelectorAll('.field-input').forEach(inp => {
+    inp.addEventListener('input', () => setState(inp, inp.value ? 'has-value' : ''));
+  });
+
+  // ── Password toggle
+  const pwdInp   = document.getElementById('password');
+  const toggleBtn = document.getElementById('togglePwd');
+  const eyeIcon  = document.getElementById('eyeIcon');
+  const eyeOpen  = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  const eyeOff   = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+  let vis = false;
+  toggleBtn.addEventListener('click', () => {
+    vis = !vis;
+    pwdInp.type = vis ? 'text' : 'password';
+    eyeIcon.innerHTML = vis ? eyeOff : eyeOpen;
+  });
+
+  // ── Checkbox
+  document.querySelectorAll('.check-label').forEach(lbl => {
+    lbl.addEventListener('click', e => {
+      if (e.target.tagName === 'INPUT') return;
+      const inp = lbl.querySelector('input');
+      inp.checked = !inp.checked;
+    });
+  });
+
+  // ── Ripple
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.addEventListener('click', e => {
+    const r = document.createElement('span');
+    const rect = submitBtn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 1.5;
+    r.className = 'ripple';
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px`;
+    submitBtn.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+  });
+
+  // ── Form submit (demo)
+  document.getElementById('adminForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const emailInp = document.getElementById('email');
+    const emailErr = document.getElementById('email-error');
+    const pwdErr   = document.getElementById('pwd-error');
+    const formErr  = document.getElementById('formError');
+    let valid = true;
+
+    // Clear previous errors
+    [emailErr, pwdErr, formErr].forEach(el => el.classList.remove('show'));
+    setState(emailInp, emailInp.value ? 'has-value' : '');
+    setState(pwdInp, pwdInp.value ? 'has-value' : '');
+
+    if (!emailInp.value || !emailInp.value.includes('@')) {
+      setState(emailInp, 'error');
+      emailErr.classList.add('show');
+      valid = false;
+    }
+    if (!pwdInp.value) {
+      setState(pwdInp, 'error');
+      pwdErr.classList.add('show');
+      valid = false;
+    }
+    if (!valid) return;
+
+    // Simulate loading
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+
+    setTimeout(() => {
+      const email = emailInp.value.trim().toLowerCase();
+      const domainOk = email.endsWith('@startrader.com') || email.endsWith('@starprime.com');
+      const pwdOk = pwdInp.value.length >= 6;
+
+      if (domainOk && pwdOk) {
+        localStorage.setItem('gb_admin_session', email);
+        window.location.href = './admin-dashboard.html';
+        return;
+      }
+
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+      setState(emailInp, 'error');
+      setState(pwdInp, 'error');
+      formErr.classList.add('show');
+      const card = document.querySelector('.card');
+      card.style.animation = 'shake .4s var(--ease-out)';
+      setTimeout(() => card.style.animation = '', 450);
+    }, 900);
+  });
+
+  // Shake animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-7px); }
+      40%      { transform: translateX(7px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  `;
+  document.head.appendChild(style);
+</script>
+</body>
+</html>

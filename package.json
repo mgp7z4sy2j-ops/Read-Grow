@@ -1,0 +1,30 @@
+{
+  "name": "good-book-program",
+  "version": "1.0.0",
+  "private": true,
+  "description": "STARTRADER Reading Growth Program",
+  "scripts": {
+    "dev": "node server/index.js",
+    "start": "node server/index.js",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed.js",
+    "db:setup": "prisma db push && node prisma/seed.js",
+    "test:e2e": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+    "test:e2e:headed": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test --headed",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "prisma": "^6.19.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
+}

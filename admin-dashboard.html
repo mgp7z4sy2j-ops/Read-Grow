@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal — STARTRADER Reading Growth Program</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   TOKENS — Light blue admin theme
+══════════════════════════════════════ */
+:root {
+  --bg:          #EFF6FF;
+  --bg-2:        #F0F9FF;
+  --sb:          #FFFFFF;
+  --card:        #FFFFFF;
+  --card-border: #BFDBFE;
+  --card-hover:  #F0F9FF;
+  --row-hover:   #E0F2FE;
+  --input-bg:    #FFFFFF;
+
+  --navy:   #1E3A8A;
+  --ink:    #1E3A5F;
+  --cyan:   #2563EB;
+  --cyan-d: #1D4ED8;
+  --cyan-10: rgba(37,99,235,.10);
+  --cyan-18: rgba(37,99,235,.20);
+  --blue:   #2563EB;
+  --sky:    #0EA5E9;
+  --indigo: #6366F1;
+  --purple: #8B5CF6;
+  --green:  #059669;
+  --amber:  #D97706;
+  --red:    #DC2626;
+
+  --mist:    #64748B;
+  --m06:     rgba(37,99,235,.06);
+  --m10:     rgba(37,99,235,.12);
+  --m20:     #94A3B8;
+  --m35:     #64748B;
+  --m55:     #475569;
+  --m75:     #1E3A5F;
+
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-b:  'DM Sans', system-ui, sans-serif;
+  --ease:   cubic-bezier(.16,1,.3,1);
+
+  --sb-w:   252px;
+  --tb-h:   60px;
+  --track:  rgba(37,99,235,.10);
+  --shadow: 0 1px 3px rgba(37,99,235,.08), 0 4px 16px rgba(37,99,235,.05);
+  --shadow-lg: 0 8px 32px rgba(37,99,235,.14);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-ui); background: var(--bg); color: var(--ink);
+  overflow: hidden; -webkit-font-smoothing: antialiased; cursor: none;
+}
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+button { font-family: var(--font-ui); }
+input, select, textarea { font-family: var(--font-ui); }
+
+/* ══════════════════════════════════════
+   CURSOR
+══════════════════════════════════════ */
+.cur { position:fixed;z-index:9999;width:7px;height:7px;border-radius:50%;background:var(--cyan);pointer-events:none;transform:translate(-50%,-50%);transition:width .18s var(--ease),height .18s var(--ease); }
+.cur.x { width:28px;height:28px;background:rgba(37,99,235,.14); }
+.cur-r { position:fixed;z-index:9998;width:28px;height:28px;border-radius:50%;border:1px solid rgba(37,99,235,.28);pointer-events:none;transform:translate(-50%,-50%); }
+
+/* ══════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════ */
+.app { display:flex; height:100vh; overflow:hidden; }
+
+/* ══════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════ */
+.sb {
+  width:var(--sb-w); flex-shrink:0; height:100vh;
+  background:var(--sb); border-right:1px solid var(--m10);
+  display:flex; flex-direction:column; overflow:hidden; position:relative; z-index:10;
+  box-shadow:1px 0 0 rgba(37,99,235,.08);
+}
+.sb-logo { padding:22px 20px 16px; border-bottom:1px solid var(--m06); background:linear-gradient(180deg,#FFFFFF 0%,#F8FBFF 100%); }
+.sb-logo img { height:30px; width:auto; }
+.sb-logo-badge {
+  display:inline-flex;align-items:center;gap:5px;margin-top:8px;
+  background:var(--cyan-10);border:1px solid var(--cyan-18);border-radius:99px;
+  padding:3px 10px 3px 8px;
+  font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan-d);
+}
+.sb-logo-badge-dot { width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 5px rgba(37,99,235,.4);animation:pulse 2.4s ease infinite; }
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.65)}}
+
+.sb-user { padding:14px 16px;border-bottom:1px solid var(--m06);display:flex;align-items:center;gap:10px; }
+.sb-av { width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#0EA5E9);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0; }
+.sb-uname { font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.2; }
+.sb-urole { font-size:11px;color:var(--cyan-d);margin-top:2px;font-weight:500; }
+
+.sb-nav { flex:1;padding:10px 0;overflow-y:auto; }
+.sb-lbl { font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--m20);padding:14px 20px 6px; }
+.sb-item {
+  display:flex;align-items:center;gap:10px;padding:9px 16px 9px 18px;margin:1px 8px;
+  border-radius:9px;cursor:none;font-size:13px;font-weight:500;color:var(--m35);
+  transition:background .15s,color .15s;position:relative;
+}
+.sb-item:hover { background:var(--row-hover);color:var(--m75); }
+.sb-item.active { background:var(--cyan-10);color:var(--ink);border-left:2.5px solid var(--cyan);margin-left:8px;padding-left:15.5px;font-weight:600; }
+.sb-item.active .sb-ic { color:var(--cyan-d); }
+.sb-ic { width:16px;height:16px;flex-shrink:0; }
+.sb-ic svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.75; }
+.sb-cnt { margin-left:auto;background:var(--amber);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px; }
+.sb-cnt.red { background:var(--red); color:#fff; }
+
+.sb-foot { border-top:1px solid var(--m06);padding:10px 10px 14px; }
+.sb-foot-lnk { display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:none;font-size:12.5px;color:var(--m35);transition:color .15s,background .15s; }
+.sb-foot-lnk:hover { color:var(--m75);background:var(--row-hover); }
+.sb-foot-lnk svg { width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.75; }
+
+/* ══════════════════════════════════════
+   MAIN
+══════════════════════════════════════ */
+.main { flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg-2); }
+
+/* Topbar */
+.tb {
+  height:var(--tb-h);flex-shrink:0;
+  border-bottom:1px solid var(--m10);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 36px; background:linear-gradient(180deg,#FFFFFF 0%,#F8FBFF 100%);
+  box-shadow:0 1px 0 rgba(37,99,235,.08);
+}
+.tb-breadcrumb { font-size:13px;color:var(--m35); }
+.tb-breadcrumb strong { color:var(--ink); font-weight:600; }
+.tb-breadcrumb span { color:var(--m20); margin:0 6px; }
+.tb-right { display:flex;align-items:center;gap:10px; }
+.tb-btn {
+  display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;cursor:none;
+  font-size:12.5px;font-weight:600;border:none;
+  transition:all .18s var(--ease);position:relative;overflow:hidden;
+}
+.tb-btn.primary { background:var(--cyan);color:#fff; }
+.tb-btn.primary:hover { background:#1D4ED8;transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.28); }
+.tb-btn.ghost { background:#EFF6FF;color:var(--m55);border:1px solid var(--card-border); }
+.tb-btn.ghost:hover { background:#DBEAFE;color:var(--ink);border-color:rgba(37,99,235,.22); }
+.tb-btn svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2; }
+.tb-notif { width:34px;height:34px;border-radius:8px;background:#EFF6FF;border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;cursor:none;position:relative;transition:background .15s; }
+.tb-notif:hover { background:#DBEAFE; }
+.tb-notif svg { width:16px;height:16px;stroke:var(--m35);fill:none;stroke-width:1.75; }
+.tb-notif-dot { position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid var(--sb); }
+
+/* Content area */
+.content { flex:1;overflow-y:auto;padding:32px 36px 80px; }
+
+/* Tabs */
+.tab-panel { display:none; }
+.tab-panel.active { display:block;animation:fadeUp .35s var(--ease); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══════════════════════════════════════
+   SHARED
+══════════════════════════════════════ */
+.page-hd { display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px; }
+.page-title { font-family:var(--font-d);font-size:28px;font-weight:700;color:var(--ink);line-height:1.1; }
+.page-title em { color:var(--cyan-d);font-style:italic; }
+.page-sub { font-size:13px;color:var(--m35);margin-top:4px; }
+
+/* Card */
+.card { background:var(--card);border:1px solid var(--card-border);border-radius:16px;box-shadow:var(--shadow); }
+.card-body { padding:20px 22px; }
+.card-hd { padding:16px 22px;border-bottom:1px solid var(--m06);display:flex;align-items:center;justify-content:space-between; }
+.card-hd-title { font-size:13.5px;font-weight:600;color:var(--ink); }
+
+/* Status badges */
+.badge {
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;
+  letter-spacing:.03em;white-space:nowrap;
+}
+.badge-dot { width:5px;height:5px;border-radius:50%; }
+.b-pending  { background:rgba(245,158,11,.15);color:#F59E0B;border:1px solid rgba(245,158,11,.25); }
+.b-pending .badge-dot  { background:#F59E0B; }
+.b-approved { background:rgba(59,130,246,.15);color:#3B82F6;border:1px solid rgba(59,130,246,.25); }
+.b-approved .badge-dot { background:#3B82F6; }
+.b-purchased{ background:rgba(99,102,241,.15);color:#818CF8;border:1px solid rgba(99,102,241,.25); }
+.b-purchased .badge-dot{ background:#818CF8; }
+.b-packaging{ background:rgba(139,92,246,.15);color:#A78BFA;border:1px solid rgba(139,92,246,.25); }
+.b-packaging .badge-dot{ background:#A78BFA; }
+.b-shipped  { background:rgba(37,99,235,.10);color:var(--cyan-d);border:1px solid var(--cyan-18); }
+.b-shipped .badge-dot  { background:var(--cyan); }
+.b-delivered{ background:rgba(16,185,129,.14);color:#34D399;border:1px solid rgba(16,185,129,.25); }
+.b-delivered .badge-dot{ background:#10B981; }
+.b-rejected { background:rgba(239,68,68,.14);color:#F87171;border:1px solid rgba(239,68,68,.25); }
+.b-rejected .badge-dot { background:#EF4444; }
+.b-active   { background:rgba(16,185,129,.12);color:#059669;border:1px solid rgba(16,185,129,.22); }
+.b-inactive { background:#F1F5F9;color:var(--m35);border:1px solid var(--m10); }
+
+/* Table */
+.tbl-wrap { overflow-x:auto;border-radius:14px;border:1px solid var(--card-border);background:var(--card);box-shadow:var(--shadow); }
+table { width:100%;border-collapse:collapse;min-width:700px; }
+thead th { padding:11px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m35);background:#EFF6FF;white-space:nowrap;text-align:left;border-bottom:1px solid var(--card-border); }
+thead th:first-child { padding-left:18px; }
+thead th:last-child { padding-right:18px; }
+tbody tr { border-top:1px solid var(--m06);transition:background .12s; }
+tbody tr:hover { background:var(--row-hover); }
+tbody td { padding:13px 14px;font-size:13px;color:var(--m55);vertical-align:middle; }
+tbody td:first-child { padding-left:18px; }
+tbody td:last-child { padding-right:18px; }
+.td-primary { color:var(--ink);font-weight:500; }
+.td-sub { color:var(--m35);font-size:11.5px;margin-top:2px; }
+
+/* Checkbox */
+.tbl-check { width:16px;height:16px;border-radius:4px;border:1.5px solid var(--m20);background:transparent;cursor:none;appearance:none;-webkit-appearance:none;transition:background .15s,border-color .15s; }
+.tbl-check:checked { background:var(--cyan);border-color:var(--cyan); }
+.tbl-check:checked::after { content:'✓';display:flex;align-items:center;justify-content:center;color:var(--navy);font-size:10px;font-weight:700;line-height:16px; }
+
+/* Action buttons */
+.act-btn {
+  padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;
+  border:none;cursor:none;transition:all .15s var(--ease);
+  display:inline-flex;align-items:center;gap:5px;
+}
+.act-btn svg { width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2; }
+.act-approve { background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.25); }
+.act-approve:hover { background:rgba(16,185,129,.28);transform:translateY(-1px); }
+.act-reject  { background:rgba(239,68,68,.12);color:#F87171;border:1px solid rgba(239,68,68,.22); }
+.act-reject:hover  { background:rgba(239,68,68,.24);transform:translateY(-1px); }
+.act-view    { background:#EFF6FF;color:var(--m55);border:1px solid var(--card-border); }
+.act-view:hover    { background:#DBEAFE;color:var(--ink); }
+.act-ship    { background:rgba(37,99,235,.10);color:var(--cyan-d);border:1px solid var(--cyan-18); }
+.act-ship:hover    { background:rgba(37,99,235,.18); }
+.act-done    { background:#F8FAFC;color:var(--m35);border:1px solid var(--m06); }
+
+/* Buttons */
+.btn {
+  display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;
+  font-size:13px;font-weight:600;border:none;cursor:none;
+  transition:all .18s var(--ease);position:relative;overflow:hidden;
+}
+.btn:active { transform:scale(.96)!important; }
+.btn::after { content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-15deg);transition:left .5s var(--ease);pointer-events:none; }
+.btn:hover::after { left:150%; }
+.btn-cyan { background:var(--cyan);color:#fff;font-weight:700; }
+.btn-cyan:hover { background:#1D4ED8;transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,.28); }
+.btn-outline { background:#fff;color:var(--m55);border:1px solid var(--card-border); }
+.btn-outline:hover { border-color:rgba(37,99,235,.25);color:var(--ink);background:#EFF6FF; }
+.btn-danger { background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.25); }
+.btn-danger:hover { background:rgba(239,68,68,.28); }
+.btn svg { width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2; }
+.ripple { position:absolute;border-radius:50%;transform:scale(0);background:rgba(255,255,255,.2);animation:rippleOut .5s var(--ease) forwards;pointer-events:none; }
+@keyframes rippleOut { to{transform:scale(4);opacity:0} }
+
+/* Search/filter row */
+.filter-row { display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap; }
+.search-wrap { position:relative;flex:1;min-width:220px; }
+.search-wrap svg { position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--m20);fill:none;stroke-width:2;pointer-events:none; }
+.search-inp { width:100%;padding:9px 14px 9px 34px;background:var(--input-bg);border:1px solid var(--m10);border-radius:9px;font-size:13px;color:var(--m75);outline:none;transition:border-color .2s,box-shadow .2s; }
+.search-inp::placeholder { color:var(--m20); }
+.search-inp:focus { border-color:var(--cyan-18);box-shadow:0 0 0 3px rgba(37,99,235,.12); }
+.filter-sel { padding:9px 32px 9px 14px;background:var(--input-bg);border:1px solid var(--m10);border-radius:9px;font-size:13px;color:var(--m55);outline:none;appearance:none;cursor:none;transition:border-color .2s; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center; }
+.filter-sel:focus { border-color:var(--cyan-18); }
+
+/* Status filter tabs */
+.status-tabs { display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--m10);padding-bottom:0; }
+.stab { padding:8px 16px;font-size:13px;font-weight:500;color:var(--m35);background:none;border:none;cursor:none;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;margin-bottom:-1px;display:flex;align-items:center;gap:6px; }
+.stab.active { color:var(--cyan-d);border-bottom-color:var(--cyan);font-weight:600; }
+.stab:hover:not(.active) { color:var(--m55); }
+.stab-n { font-size:11px;font-weight:700;padding:1px 6px;border-radius:99px;background:#F1F5F9;color:var(--m35); }
+.stab.active .stab-n { background:var(--cyan-10);color:var(--cyan-d); }
+
+/* Bulk action bar */
+.bulk-bar {
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(37,99,235,.08);border:1px solid var(--cyan-18);
+  border-radius:10px;padding:11px 18px;margin-bottom:16px;
+  transform:translateY(-8px);opacity:0;pointer-events:none;
+  transition:opacity .25s var(--ease),transform .25s var(--ease);
+}
+.bulk-bar.show { opacity:1;transform:translateY(0);pointer-events:auto; }
+.bulk-info { font-size:13px;color:var(--cyan-d);font-weight:500; }
+.bulk-info span { color:var(--ink);font-weight:700; }
+.bulk-actions { display:flex;gap:8px; }
+
+/* Avatar */
+.emp-av { width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;color:#fff; }
+
+/* ══════════════════════════════════════
+   OVERVIEW
+══════════════════════════════════════ */
+.kpi-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px; }
+.kpi {
+  background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:20px 22px;
+  transition:border-color .2s,transform .2s var(--ease),box-shadow .2s;cursor:none;
+  box-shadow:var(--shadow);
+}
+.kpi:hover { border-color:rgba(15,17,71,.12);transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,17,71,.08); }
+.kpi-label { font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--m35);margin-bottom:14px;display:flex;align-items:center;gap:8px; }
+.kpi-label svg { width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2; }
+.kpi-val { font-family:var(--font-d);font-size:38px;font-weight:700;line-height:1;margin-bottom:6px; }
+.kpi-delta { font-size:12px;display:flex;align-items:center;gap:5px; }
+.kpi-delta.up { color:#059669; }
+.kpi-delta.down { color:#DC2626; }
+.kpi-delta.flat { color:var(--m35); }
+.kpi-delta svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5; }
+
+.overview-grid { display:grid;grid-template-columns:1fr 320px;gap:20px; }
+
+/* Activity feed */
+.feed { display:flex;flex-direction:column;gap:0; }
+.feed-item { padding:13px 0;border-bottom:1px solid var(--m06);display:flex;align-items:flex-start;gap:12px; }
+.feed-item:last-child { border-bottom:none; }
+.feed-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px; }
+.feed-content { flex:1;min-width:0; }
+.feed-text { font-size:13px;color:var(--m55);line-height:1.5; }
+.feed-text strong { color:var(--ink);font-weight:600; }
+.feed-time { font-size:11px;color:var(--m20);margin-top:3px; }
+
+/* Quick actions */
+.qa-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+.qa-btn {
+  display:flex;flex-direction:column;gap:6px;padding:14px 16px;
+  background:var(--card);border:1px solid var(--card-border);border-radius:12px;cursor:none;
+  transition:background .15s,border-color .2s,transform .2s var(--ease),box-shadow .2s;
+  text-align:left;box-shadow:var(--shadow);
+}
+.qa-btn:hover { background:var(--card-hover);border-color:rgba(15,17,71,.12);transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,17,71,.07); }
+.qa-btn-ico { width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:4px; }
+.qa-btn-ico svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.75; }
+.qa-btn-label { font-size:13px;font-weight:600;color:var(--ink); }
+.qa-btn-sub { font-size:11.5px;color:var(--m35); }
+
+/* ══════════════════════════════════════
+   ANALYTICS
+══════════════════════════════════════ */
+.analytics-grid { display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px; }
+.bar-chart { display:flex;flex-direction:column;gap:12px; }
+.bar-row { display:flex;align-items:center;gap:12px; }
+.bar-label { font-size:12.5px;color:var(--m55);width:88px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.bar-track { flex:1;height:7px;background:var(--track);border-radius:99px;overflow:hidden; }
+.bar-fill { height:100%;border-radius:99px;transition:width 1.2s var(--ease); }
+.bar-val { font-size:12px;font-weight:600;color:var(--m55);width:32px;text-align:right; }
+
+.trend-chart { display:flex;align-items:flex-end;gap:10px;height:100px;padding-bottom:4px; }
+.trend-col { display:flex;flex-direction:column;align-items:center;gap:6px;flex:1; }
+.trend-bar { width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height 1s var(--ease); }
+.trend-lbl { font-size:10.5px;color:var(--m20);white-space:nowrap; }
+
+/* ══════════════════════════════════════
+   MODAL
+══════════════════════════════════════ */
+.modal-overlay {
+  position:fixed;inset:0;z-index:900;background:rgba(30,58,138,.25);
+  backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.modal-overlay.show { opacity:1;pointer-events:auto; }
+.modal {
+  background:#fff;border:1px solid var(--m10);border-radius:18px;
+  padding:32px;width:100%;max-width:440px;
+  transform:scale(.95) translateY(16px);transition:transform .3s var(--ease);
+  box-shadow:var(--shadow-lg);
+}
+.modal-overlay.show .modal { transform:scale(1) translateY(0); }
+.modal-title { font-family:var(--font-d);font-size:22px;font-weight:700;color:var(--ink);margin-bottom:6px; }
+.modal-sub { font-size:13px;color:var(--m35);margin-bottom:20px;line-height:1.6; }
+.modal-field { margin-bottom:16px; }
+.modal-label { font-size:12.5px;font-weight:600;color:var(--m55);margin-bottom:7px;display:block; }
+.modal-inp, .modal-ta {
+  width:100%;padding:11px 14px;background:var(--input-bg);border:1px solid var(--m10);
+  border-radius:9px;color:var(--ink);font-size:13.5px;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.modal-inp:focus, .modal-ta:focus { border-color:var(--cyan-18);box-shadow:0 0 0 3px rgba(37,99,235,.12); }
+.modal-ta { resize:vertical;min-height:80px;font-family:var(--font-b);font-weight:300;line-height:1.65; }
+.modal-inp::placeholder, .modal-ta::placeholder { color:var(--m20); }
+.modal-actions { display:flex;gap:10px;margin-top:24px; }
+.modal-wide { max-width:560px; }
+.modal-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:20px; }
+.modal-kv { }
+.modal-kv-lbl { font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m35);margin-bottom:4px; }
+.modal-kv-val { font-size:13.5px;color:var(--ink);line-height:1.45; }
+.modal-divider { border-top:1px solid var(--m06);margin:18px 0;padding-top:16px; }
+.modal-section-title { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.11em;color:var(--m35);margin-bottom:10px; }
+
+/* Toast */
+.toast-wrap { position:fixed;bottom:28px;right:28px;z-index:950;display:flex;flex-direction:column;gap:10px;pointer-events:none; }
+.toast {
+  display:flex;align-items:flex-start;gap:12px;padding:14px 18px;min-width:280px;max-width:360px;
+  background:#fff;border:1px solid var(--m10);border-radius:12px;
+  box-shadow:var(--shadow-lg);
+  transform:translateX(calc(100% + 40px));opacity:0;
+  transition:transform .35s var(--ease),opacity .35s;
+  pointer-events:auto;
+}
+.toast.show { transform:translateX(0);opacity:1; }
+.toast-ico { width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+.toast-ico svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2; }
+.toast-body { flex:1;min-width:0; }
+.toast-title { font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px; }
+.toast-msg { font-size:12px;color:var(--m35);line-height:1.45; }
+
+/* Notification panel */
+.notif-panel {
+  position:absolute;top:calc(100% + 10px);right:0;width:340px;
+  background:#fff;border:1px solid var(--m10);border-radius:14px;
+  box-shadow:var(--shadow-lg);
+  opacity:0;pointer-events:none;transform:translateY(-8px) scale(.97);
+  transition:opacity .22s,transform .22s var(--ease);z-index:500;
+}
+.notif-panel.open { opacity:1;pointer-events:auto;transform:translateY(0) scale(1); }
+.notif-hd { padding:14px 18px;border-bottom:1px solid var(--m06);display:flex;align-items:center;justify-content:space-between; }
+.notif-hd-title { font-size:13px;font-weight:600;color:var(--ink); }
+.notif-hd-clear { font-size:11.5px;color:var(--cyan-d);background:none;border:none;cursor:none;font-weight:600; }
+.notif-list { max-height:320px;overflow-y:auto;padding:8px 0; }
+.notif-item { padding:10px 18px;display:flex;gap:10px;cursor:none;transition:background .12s; }
+.notif-item:hover { background:var(--row-hover); }
+.notif-item.unread { background:rgba(37,99,235,.06); }
+.notif-item-dot { width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px; }
+.notif-item-body { flex:1;min-width:0; }
+.notif-item-text { font-size:12.5px;color:var(--m55);line-height:1.45; }
+.notif-item-text strong { color:var(--ink);font-weight:600; }
+.notif-item-time { font-size:10.5px;color:var(--m20);margin-top:3px; }
+.tb-notif-wrap { position:relative; }
+
+/* Status stepper (order detail) */
+.status-steps { display:flex;align-items:center;gap:0;margin:16px 0 20px;overflow-x:auto;padding-bottom:4px; }
+.status-step { display:flex;align-items:center;gap:0;flex-shrink:0; }
+.status-step-dot { width:24px;height:24px;border-radius:50%;border:2px solid var(--m10);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--m35);background:#F8FAFC; }
+.status-step.done .status-step-dot { border-color:var(--cyan);background:var(--cyan-10);color:var(--cyan-d); }
+.status-step.current .status-step-dot { border-color:var(--cyan);background:var(--cyan);color:#fff;box-shadow:0 0 12px rgba(37,99,235,.35); }
+.status-step-lbl { font-size:10px;color:var(--m35);margin-top:4px;text-align:center;white-space:nowrap; }
+.status-step-col { display:flex;flex-direction:column;align-items:center;width:56px; }
+.status-step-line { width:28px;height:2px;background:var(--m10);flex-shrink:0;margin-bottom:18px; }
+.status-step-line.done { background:var(--cyan-d); }
+
+.act-next { background:rgba(59,130,246,.14);color:#60A5FA;border:1px solid rgba(59,130,246,.25); }
+.act-next:hover { background:rgba(59,130,246,.26); }
+
+.empty-state { text-align:center;padding:48px 24px;color:var(--m20); }
+.empty-state svg { width:40px;height:40px;stroke:var(--m20);fill:none;stroke-width:1.5;margin:0 auto 12px; }
+.empty-state p { font-size:13px;color:var(--m35); }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width:1100px) {
+  .kpi-grid { grid-template-columns:repeat(2,1fr); }
+  .overview-grid { grid-template-columns:1fr; }
+  .analytics-grid { grid-template-columns:1fr; }
+}
+@media (max-width:860px) {
+  body { cursor:auto;overflow:auto; }
+  .cur,.cur-r { display:none; }
+  .app { flex-direction:column;height:auto; }
+  .sb { width:100%;height:auto;flex-direction:row;overflow-x:auto; }
+  .sb-logo,.sb-user,.sb-foot { display:none; }
+  .sb-nav { display:flex;flex-direction:row;padding:6px 8px; }
+  .sb-lbl { display:none; }
+  .sb-item { white-space:nowrap;padding:7px 12px;margin:0 2px; }
+  .main { height:auto; }
+  .content { padding:20px 18px 60px;overflow:visible; }
+  .kpi-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+
+<!-- ══ REJECT MODAL ══ -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal">
+    <div class="modal-title">Reject Order</div>
+    <div class="modal-sub" id="rejectModalSub">Review this order and provide a rejection reason. The employee will be notified by email.</div>
+    <div class="modal-field">
+      <label class="modal-label">Reason for rejection</label>
+      <select class="modal-inp" id="rejectReason">
+        <option value="">Select a reason…</option>
+        <option>Book exceeds $80 budget limit</option>
+        <option>Book not in approved catalogue</option>
+        <option>Duplicate request this quarter</option>
+        <option>Employee quota already used</option>
+        <option>Other (see note below)</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Additional note (optional)</label>
+      <textarea class="modal-ta" placeholder="Add a note for the employee…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="confirmRejectBtn">Reject &amp; notify employee</button>
+      <button class="btn btn-outline" onclick="closeModal('rejectModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHIP MODAL ══ -->
+<div class="modal-overlay" id="shipModal">
+  <div class="modal">
+    <div class="modal-title">Mark as Shipped</div>
+    <div class="modal-sub">Enter the tracking number to notify the employee and update order status to Shipped.</div>
+    <div class="modal-field">
+      <label class="modal-label">Tracking number</label>
+      <input class="modal-inp" id="trackingNum" type="text" placeholder="e.g. 1Z999AA10123456784">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Carrier</label>
+      <select class="modal-inp">
+        <option>SF Express</option>
+        <option>DHL</option>
+        <option>FedEx</option>
+        <option>UPS</option>
+        <option>Australia Post</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-cyan" id="confirmShipBtn">Confirm shipment</button>
+      <button class="btn btn-outline" onclick="closeModal('shipModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ORDER DETAIL MODAL ══ -->
+<div class="modal-overlay" id="orderViewModal">
+  <div class="modal modal-wide">
+    <div class="modal-title" id="orderViewTitle">Order Details</div>
+    <div class="modal-sub" id="orderViewSub"></div>
+    <div class="status-steps" id="orderStatusSteps"></div>
+    <div class="modal-grid" id="orderViewGrid"></div>
+    <div class="modal-divider">
+      <div class="modal-section-title">Employee's reading goal</div>
+      <p id="orderReadingGoal" style="font-size:13.5px;color:var(--m55);line-height:1.65;font-family:var(--font-b);font-weight:300"></p>
+    </div>
+    <div class="modal-divider">
+      <div class="modal-section-title">Original AI request</div>
+      <p id="orderAiInput" style="font-size:13px;color:var(--m35);line-height:1.65;font-style:italic;font-family:var(--font-b);font-weight:300"></p>
+    </div>
+    <div class="modal-actions" id="orderViewActions"></div>
+    <div style="margin-top:12px"><button class="btn btn-outline" onclick="closeModal('orderViewModal')">Close</button></div>
+  </div>
+</div>
+
+<!-- ══ EMPLOYEE PROFILE MODAL ══ -->
+<div class="modal-overlay" id="empProfileModal">
+  <div class="modal modal-wide">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+      <div class="emp-av" id="empProfileAv" style="width:48px;height:48px;font-size:15px"></div>
+      <div>
+        <div class="modal-title" id="empProfileName" style="margin-bottom:2px"></div>
+        <div class="modal-sub" id="empProfileMeta" style="margin-bottom:0"></div>
+      </div>
+    </div>
+    <div class="modal-grid" id="empProfileStats"></div>
+    <div class="modal-divider">
+      <div class="modal-section-title">Reading history</div>
+      <div id="empProfileHistory" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-cyan" id="empOverrideBtn">Override quota</button>
+      <button class="btn btn-outline" onclick="closeModal('empProfileModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ QUOTA OVERRIDE MODAL ══ -->
+<div class="modal-overlay" id="quotaModal">
+  <div class="modal">
+    <div class="modal-title">Quota Override</div>
+    <div class="modal-sub" id="quotaModalSub">Manually adjust this employee's Q2 2026 book quota.</div>
+    <div class="modal-field">
+      <label class="modal-label">Action</label>
+      <select class="modal-inp" id="quotaAction">
+        <option value="extend">Extend quota — allow another book this quarter</option>
+        <option value="cancel">Cancel quota — revoke unused benefit</option>
+        <option value="reset">Reset to available — reopen unused quota</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Reason (required for audit log)</label>
+      <textarea class="modal-ta" id="quotaReason" placeholder="e.g. Manager approved exception for leadership program…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-cyan" id="confirmQuotaBtn">Apply override</button>
+      <button class="btn btn-outline" onclick="closeModal('quotaModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADD / EDIT BOOK MODAL ══ -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal modal-wide">
+    <div class="modal-title" id="bookModalTitle">Add Book</div>
+    <div class="modal-sub">Add a title to the curated library. Books over $80 will be excluded from AI recommendations.</div>
+    <div class="modal-grid">
+      <div class="modal-field" style="margin-bottom:0"><label class="modal-label">Title</label><input class="modal-inp" id="bookTitle" type="text" placeholder="Book title"></div>
+      <div class="modal-field" style="margin-bottom:0"><label class="modal-label">Author</label><input class="modal-inp" id="bookAuthor" type="text" placeholder="Author name"></div>
+      <div class="modal-field" style="margin-bottom:0"><label class="modal-label">ISBN</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="modal-inp" id="bookIsbn" type="text" placeholder="978-…" style="flex:1">
+          <button type="button" class="btn btn-outline" id="bookLookupBtn" style="white-space:nowrap;padding:10px 14px">Look up</button>
+        </div>
+      </div>
+      <div class="modal-field" style="margin-bottom:0"><label class="modal-label">Price (USD)</label><input class="modal-inp" id="bookPrice" type="number" step="0.01" max="80" placeholder="24.99"></div>
+      <div class="modal-field" style="margin-bottom:0"><label class="modal-label">Category</label>
+        <select class="modal-inp" id="bookCategory"><option>Leadership</option><option>Sales</option><option>Technology</option><option>Personal Development</option><option>Product</option><option>Finance</option></select>
+      </div>
+      <div class="modal-field" style="margin-bottom:0"><label class="modal-label">Difficulty</label>
+        <select class="modal-inp" id="bookLevel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+      </div>
+    </div>
+    <div class="modal-field" style="margin-top:16px"><label class="modal-label">Keywords (comma-separated)</label><input class="modal-inp" id="bookKeywords" type="text" placeholder="leadership, management, teams"></div>
+    <div id="bookBudgetAlert" style="display:none;margin-top:12px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.5"></div>
+    <div class="modal-actions">
+      <button class="btn btn-cyan" id="confirmBookBtn">Save book</button>
+      <button class="btn btn-outline" onclick="closeModal('bookModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="app">
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sb">
+  <div class="sb-logo">
+    <img src="./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_RGB.png" alt="STARTRADER" height="30">
+    <div class="sb-logo-badge">
+      <span class="sb-logo-badge-dot"></span>
+      Admin Portal
+    </div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av">JL</div>
+    <div>
+      <div class="sb-uname">Jessica Liu</div>
+      <div class="sb-urole">HR Admin · SuperAdmin</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-lbl">Dashboard</div>
+    <a class="sb-item active" data-tab="overview" href="#">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+      Overview
+    </a>
+    <a class="sb-item" data-tab="orders" href="#">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
+      Order Queue
+      <span class="sb-cnt" id="sbOrderCnt">7</span>
+    </a>
+    <a class="sb-item" data-tab="employees" href="#">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      Employees
+    </a>
+    <a class="sb-item" data-tab="library" href="#">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+      Book Library
+    </a>
+    <div class="sb-lbl">Insights</div>
+    <a class="sb-item" data-tab="analytics" href="#">
+      <span class="sb-ic"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+      Analytics
+    </a>
+  </nav>
+  <div style="flex:1"></div>
+  <div class="sb-foot">
+    <a href="./admin-login.html" class="sb-foot-lnk" id="adminSignOut">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </a>
+    <a href="./index.html" class="sb-foot-lnk">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Main site
+    </a>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <header class="tb">
+    <div class="tb-breadcrumb">
+      <strong id="tbTitle">Overview</strong>
+      <span>/</span>
+      <span id="tbSub">Q2 2026 · Apr – Jun</span>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif-wrap">
+        <div class="tb-notif" id="notifBtn">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <div class="tb-notif-dot" id="notifDot"></div>
+        </div>
+        <div class="notif-panel" id="notifPanel">
+          <div class="notif-hd">
+            <span class="notif-hd-title">Notifications</span>
+            <button class="notif-hd-clear" id="notifClearBtn">Mark all read</button>
+          </div>
+          <div class="notif-list" id="notifList"></div>
+        </div>
+      </div>
+      <button class="tb-btn ghost" id="exportBtn">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+      <button class="tb-btn primary" id="topPrimaryBtn" onclick="switchTab('orders');bulkApproveAll()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Bulk approve
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Good morning, <em>Jessica.</em></div>
+          <div class="page-sub">Q2 2026 · 7 orders awaiting your review · 52 days remaining in quarter</div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="kpi-label" style="color:#F59E0B"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending Orders</div>
+          <div class="kpi-val" style="color:#F59E0B" id="kpiPending">7</div>
+          <div class="kpi-delta flat"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>Awaiting review</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" style="color:#34D399"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Active Employees</div>
+          <div class="kpi-val" style="color:#34D399">124</div>
+          <div class="kpi-delta up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>+6 this quarter</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" style="color:var(--cyan-d)"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Q2 Budget Spent</div>
+          <div class="kpi-val" style="color:var(--cyan)">$4,240</div>
+          <div class="kpi-delta flat">53 books delivered</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" style="color:#818CF8"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Participation Rate</div>
+          <div class="kpi-val" style="color:#818CF8">68%</div>
+          <div class="kpi-delta up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>+8% vs Q1</div>
+        </div>
+      </div>
+
+      <!-- Bottom grid -->
+      <div class="overview-grid">
+        <div>
+          <div class="card-hd" style="background:var(--card);border-radius:16px 16px 0 0;border:1px solid var(--card-border);border-bottom:1px solid var(--m06)">
+            <span class="card-hd-title">Recent Orders</span>
+            <button class="act-btn act-view" data-tab="orders">View all →</button>
+          </div>
+          <div class="tbl-wrap" style="border-radius:0 0 16px 16px;border-top:none">
+            <table>
+              <thead><tr>
+                <th>Employee</th><th>Book</th><th>Dept</th><th>Status</th><th>Submitted</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="overviewTbody">
+                <tr>
+                  <td><div class="td-primary">Kevin Wang</div><div class="td-sub">Sales · StarTrader</div></td>
+                  <td><div class="td-primary">The Manager's Path</div><div class="td-sub">$28.99</div></td>
+                  <td>Sales</td>
+                  <td><span class="badge b-pending"><span class="badge-dot"></span>Pending</span></td>
+                  <td class="td-sub">May 23, 2026</td>
+                  <td style="display:flex;gap:6px;align-items:center">
+                    <button class="act-btn act-approve" onclick="approveOrder(this)">
+                      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Approve
+                    </button>
+                    <button class="act-btn act-reject" onclick="openRejectModal(this)">Reject</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><div class="td-primary">Sarah Lin</div><div class="td-sub">Product · StarTrader</div></td>
+                  <td><div class="td-primary">Radical Candor</div><div class="td-sub">$19.99</div></td>
+                  <td>Product</td>
+                  <td><span class="badge b-shipped"><span class="badge-dot"></span>Shipped</span></td>
+                  <td class="td-sub">May 18, 2026</td>
+                  <td><span class="act-btn act-done" style="color:var(--m20);border:none">Tracking sent</span></td>
+                </tr>
+                <tr>
+                  <td><div class="td-primary">Marcus Chen</div><div class="td-sub">Engineering · StarTrader</div></td>
+                  <td><div class="td-primary">The Phoenix Project</div><div class="td-sub">$24.99</div></td>
+                  <td>Engineering</td>
+                  <td><span class="badge b-delivered"><span class="badge-dot"></span>Delivered</span></td>
+                  <td class="td-sub">May 10, 2026</td>
+                  <td><span class="act-btn act-done" style="color:var(--m20);border:none">Complete</span></td>
+                </tr>
+                <tr>
+                  <td><div class="td-primary">Aisha Karim</div><div class="td-sub">Finance · StarPrime</div></td>
+                  <td><div class="td-primary">Thinking, Fast and Slow</div><div class="td-sub">$18.99</div></td>
+                  <td>Finance</td>
+                  <td><span class="badge b-pending"><span class="badge-dot"></span>Pending</span></td>
+                  <td class="td-sub">May 22, 2026</td>
+                  <td style="display:flex;gap:6px">
+                    <button class="act-btn act-approve" onclick="approveOrder(this)">
+                      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Approve
+                    </button>
+                    <button class="act-btn act-reject" onclick="openRejectModal(this)">Reject</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><div class="td-primary">Jamie Park</div><div class="td-sub">Marketing · StarTrader</div></td>
+                  <td><div class="td-primary">Influence</div><div class="td-sub">$16.99</div></td>
+                  <td>Marketing</td>
+                  <td><span class="badge b-packaging"><span class="badge-dot"></span>Packaging</span></td>
+                  <td class="td-sub">May 15, 2026</td>
+                  <td>
+                    <button class="act-btn act-ship" onclick="openShipModal(this)">
+                      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                      Mark shipped
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Quick actions -->
+          <div style="margin-top:20px">
+            <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.11em;color:var(--m20);margin-bottom:12px">Quick Actions</div>
+            <div class="qa-grid">
+              <button class="qa-btn" onclick="switchTab('orders')">
+                <div class="qa-btn-ico" style="background:rgba(245,158,11,.12);color:#F59E0B"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="qa-btn-label">Bulk approve eligible</span>
+                <span class="qa-btn-sub">7 orders under $80</span>
+              </button>
+              <button class="qa-btn">
+                <div class="qa-btn-ico" style="background:rgba(22,233,215,.1);color:var(--cyan-d)"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                <span class="qa-btn-label">Export Q2 report</span>
+                <span class="qa-btn-sub">CSV · all orders</span>
+              </button>
+              <button class="qa-btn" onclick="switchTab('library')">
+                <div class="qa-btn-ico" style="background:rgba(99,102,241,.12);color:#818CF8"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+                <span class="qa-btn-label">Add new book</span>
+                <span class="qa-btn-sub">Expand library</span>
+              </button>
+              <button class="qa-btn" onclick="switchTab('analytics')">
+                <div class="qa-btn-ico" style="background:rgba(139,92,246,.12);color:#A78BFA"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+                <span class="qa-btn-label">View analytics</span>
+                <span class="qa-btn-sub">Q2 insights</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity feed -->
+        <div>
+          <div class="card-hd" style="background:var(--card);border-radius:16px 16px 0 0;border:1px solid var(--card-border);border-bottom:1px solid var(--m06)">
+            <span class="card-hd-title">Activity Feed</span>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--card-border);border-top:none;border-radius:0 0 16px 16px;padding:8px 20px 16px">
+            <div class="feed">
+              <div class="feed-item"><div class="feed-dot" style="background:#F59E0B"></div><div class="feed-content"><div class="feed-text"><strong>Kevin Wang</strong> submitted a book request — The Manager's Path</div><div class="feed-time">2 hours ago</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#10B981"></div><div class="feed-content"><div class="feed-text"><strong>Sarah Lin</strong>'s book was marked as shipped · SF Express</div><div class="feed-time">5 hours ago</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#F59E0B"></div><div class="feed-content"><div class="feed-text"><strong>Aisha Karim</strong> submitted a book request — Thinking, Fast and Slow</div><div class="feed-time">Yesterday, 4:12 PM</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#10B981"></div><div class="feed-content"><div class="feed-text"><strong>Marcus Chen</strong> received delivery · The Phoenix Project</div><div class="feed-time">Yesterday, 2:08 PM</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#8B5CF6"></div><div class="feed-content"><div class="feed-text"><strong>Jamie Park</strong>'s order is being packaged</div><div class="feed-time">May 21</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#3B82F6"></div><div class="feed-content"><div class="feed-text"><strong>12 orders</strong> bulk-approved by HR team</div><div class="feed-time">May 20</div></div></div>
+              <div class="feed-item"><div class="feed-dot" style="background:#6B7280"></div><div class="feed-content"><div class="feed-text"><strong>Q2 quota</strong> opened for all 124 active employees</div><div class="feed-time">Apr 1</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ORDER QUEUE ══ -->
+    <div class="tab-panel" id="tab-orders">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Order <em>Queue</em></div>
+          <div class="page-sub">Q2 2026 · Review and action employee book requests</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline" id="bulkApproveBtn" onclick="bulkApproveAll()">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Approve all eligible
+          </button>
+        </div>
+      </div>
+
+      <div class="bulk-bar" id="bulkBar">
+        <div class="bulk-info"><span id="bulkCount">0</span> orders selected</div>
+        <div class="bulk-actions">
+          <button class="btn btn-cyan" onclick="bulkApproveSelected()">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Approve selected
+          </button>
+          <button class="btn btn-danger" onclick="clearSelection()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="status-tabs">
+        <button class="stab active" data-filter="all">All <span class="stab-n">24</span></button>
+        <button class="stab" data-filter="pending">Pending <span class="stab-n">7</span></button>
+        <button class="stab" data-filter="progress">In Progress <span class="stab-n">8</span></button>
+        <button class="stab" data-filter="delivered">Delivered <span class="stab-n">9</span></button>
+      </div>
+
+      <div class="filter-row">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-inp" id="ordersSearch" type="text" placeholder="Search by employee or book title…">
+        </div>
+        <select class="filter-sel" id="ordersDeptFilter">
+          <option value="">All departments</option>
+          <option>Sales</option><option>Technology</option><option>Product</option>
+          <option>Operations</option><option>Marketing</option><option>Finance</option><option>Engineering</option>
+        </select>
+        <select class="filter-sel" id="ordersCoFilter">
+          <option value="">All companies</option>
+          <option>StarTrader</option><option>StarPrime</option>
+        </select>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th><input type="checkbox" class="tbl-check" id="selectAll" onchange="toggleSelectAll(this)"></th>
+            <th>Employee</th><th>Book</th><th>Price</th><th>Status</th><th>Submitted</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="ordersTbody">
+            <tr><td colspan="7" class="td-sub" style="text-align:center;padding:32px">Loading orders…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ EMPLOYEES ══ -->
+    <div class="tab-panel" id="tab-employees">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Employee <em>Management</em></div>
+          <div class="page-sub">124 active employees · StarTrader &amp; StarPrime</div>
+        </div>
+        <button class="btn btn-outline">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+      <div class="filter-row">
+        <div class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="search-inp" id="empSearch" placeholder="Search employees…"></div>
+        <select class="filter-sel" id="empDeptFilter"><option value="">All departments</option><option>Sales</option><option>Technology</option><option>Product</option><option>Finance</option><option>Marketing</option><option>Engineering</option><option>HR &amp; People</option></select>
+        <select class="filter-sel" id="empCoFilter"><option value="">All companies</option><option>StarTrader</option><option>StarPrime</option></select>
+        <select class="filter-sel" id="empStatusFilter"><option value="">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Employee</th><th>Department</th><th>Company</th><th>Q2 Status</th><th>Books Read</th><th>Review Rate</th><th>Last Active</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="employeesTbody">
+            <tr data-dept="Sales" data-company="StarTrader" data-status="active" data-employee='{"name":"Kevin Wang","email":"kevin@startrader.com","dept":"Sales","company":"StarTrader","books":3,"reviews":"67%","q2":"Pending","initials":"KW","color":"linear-gradient(135deg,#C07328,#8C4E10)","history":["Q1 2026 — Atomic Habits ★★★★","Q4 2025 — Never Split the Difference ★★★★★","Q3 2025 — The Lean Startup ★★★"]}'>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="emp-av" style="background:linear-gradient(135deg,#C07328,#8C4E10)">KW</div><div><div class="td-primary">Kevin Wang</div><div class="td-sub">kevin@startrader.com</div></div></div></td><td>Sales</td><td class="td-sub">StarTrader</td><td><span class="badge b-pending"><span class="badge-dot"></span>Pending</span></td><td class="td-primary">3</td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:67%;height:100%;background:var(--cyan);border-radius:99px"></div></div><span class="td-sub">67%</span></div></td><td class="td-sub">Today</td><td style="display:flex;gap:6px"><button class="act-btn act-view" onclick="openEmpProfile(this)">Profile</button><button class="act-btn act-view" onclick="openQuotaModal(this)">Override</button></td></tr>
+            <tr data-dept="Product" data-company="StarTrader" data-status="active" data-employee='{"name":"Sarah Lin","email":"sarah.lin@startrader.com","dept":"Product","company":"StarTrader","books":4,"reviews":"100%","q2":"Shipped","initials":"SL","color":"linear-gradient(135deg,#2A3290,#0047BB)","history":["Q1 2026 — Radical Candor (current)","Q4 2025 — Inspired ★★★★★","Q3 2025 — Sprint ★★★★","Q2 2025 — Hooked ★★★★"]}'>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="emp-av" style="background:linear-gradient(135deg,#2A3290,#0047BB)">SL</div><div><div class="td-primary">Sarah Lin</div><div class="td-sub">sarah.lin@startrader.com</div></div></div></td><td>Product</td><td class="td-sub">StarTrader</td><td><span class="badge b-shipped"><span class="badge-dot"></span>Shipped</span></td><td class="td-primary">4</td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:100%;height:100%;background:#10B981;border-radius:99px"></div></div><span class="td-sub">100%</span></div></td><td class="td-sub">Yesterday</td><td style="display:flex;gap:6px"><button class="act-btn act-view" onclick="openEmpProfile(this)">Profile</button></td></tr>
+            <tr data-dept="Engineering" data-company="StarTrader" data-status="active" data-employee='{"name":"Marcus Chen","email":"marcus@startrader.com","dept":"Engineering","company":"StarTrader","books":3,"reviews":"75%","q2":"Delivered","initials":"MC","color":"linear-gradient(135deg,#1e4020,#3a7a40)","history":["Q2 2026 — The Phoenix Project (current)","Q4 2025 — Clean Code ★★★★","Q3 2025 — Designing Data-Intensive Applications ★★★★★"]}'>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="emp-av" style="background:linear-gradient(135deg,#1e4020,#3a7a40)">MC</div><div><div class="td-primary">Marcus Chen</div><div class="td-sub">marcus@startrader.com</div></div></div></td><td>Engineering</td><td class="td-sub">StarTrader</td><td><span class="badge b-delivered"><span class="badge-dot"></span>Delivered</span></td><td class="td-primary">3</td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:75%;height:100%;background:var(--cyan);border-radius:99px"></div></div><span class="td-sub">75%</span></div></td><td class="td-sub">May 22</td><td style="display:flex;gap:6px"><button class="act-btn act-view" onclick="openEmpProfile(this)">Profile</button></td></tr>
+            <tr data-dept="Finance" data-company="StarPrime" data-status="active" data-employee='{"name":"Aisha Karim","email":"aisha@starprime.com","dept":"Finance","company":"StarPrime","books":2,"reviews":"50%","q2":"Pending","initials":"AK","color":"linear-gradient(135deg,#1a3848,#2e7490)","history":["Q1 2026 — The Psychology of Money ★★★★","Q4 2025 — (no review submitted)"]}'>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="emp-av" style="background:linear-gradient(135deg,#1a3848,#2e7490)">AK</div><div><div class="td-primary">Aisha Karim</div><div class="td-sub">aisha@starprime.com</div></div></div></td><td>Finance</td><td class="td-sub">StarPrime</td><td><span class="badge b-pending"><span class="badge-dot"></span>Pending</span></td><td class="td-primary">2</td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:50%;height:100%;background:#F59E0B;border-radius:99px"></div></div><span class="td-sub">50%</span></div></td><td class="td-sub">May 22</td><td style="display:flex;gap:6px"><button class="act-btn act-view" onclick="openEmpProfile(this)">Profile</button></td></tr>
+            <tr data-dept="Marketing" data-company="StarTrader" data-status="active" data-employee='{"name":"Jamie Park","email":"jamie@startrader.com","dept":"Marketing","company":"StarTrader","books":2,"reviews":"100%","q2":"Packaging","initials":"JP","color":"linear-gradient(135deg,#1e4020,#3a7a40)","history":["Q2 2026 — Influence (current)","Q4 2025 — Contagious ★★★★★"]}'>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="emp-av" style="background:linear-gradient(135deg,#1e4020,#3a7a40)">JP</div><div><div class="td-primary">Jamie Park</div><div class="td-sub">jamie@startrader.com</div></div></div></td><td>Marketing</td><td class="td-sub">StarTrader</td><td><span class="badge b-packaging"><span class="badge-dot"></span>Packaging</span></td><td class="td-primary">2</td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:100%;height:100%;background:#10B981;border-radius:99px"></div></div><span class="td-sub">100%</span></div></td><td class="td-sub">May 21</td><td style="display:flex;gap:6px"><button class="act-btn act-view" onclick="openEmpProfile(this)">Profile</button></td></tr>
+            <tr data-dept="HR &amp; People" data-company="StarPrime" data-status="inactive" data-employee='{"name":"Priya Lal","email":"priya@starprime.com","dept":"HR & People","company":"StarPrime","books":1,"reviews":"0%","q2":"No request","initials":"PL","color":"rgba(255,255,255,.08)","history":["Q4 2025 — Dare to Lead (no review)"]}'>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="emp-av" style="background:linear-gradient(135deg,#94A3B8,#64748B)">PL</div><div><div class="td-primary">Priya Lal</div><div class="td-sub">priya@starprime.com</div></div></div></td><td>HR &amp; People</td><td class="td-sub">StarPrime</td><td><span class="badge b-inactive">No request</span></td><td class="td-primary">1</td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:0%;height:100%;background:#EF4444;border-radius:99px"></div></div><span class="td-sub">0%</span></div></td><td class="td-sub">May 19</td><td style="display:flex;gap:6px"><button class="act-btn act-view" onclick="openEmpProfile(this)">Profile</button><button class="act-btn act-view" onclick="nudgeEmployee(this)">Nudge</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ BOOK LIBRARY ══ -->
+    <div class="tab-panel" id="tab-library">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Book <em>Library</em></div>
+          <div class="page-sub" id="libraryCountSub">100 titles · Updated Apr 1, 2026</div>
+        </div>
+        <button class="btn btn-cyan" id="addBookBtn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add book</button>
+      </div>
+      <div class="filter-row">
+        <div class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="search-inp" id="libSearch" placeholder="Search title, author, ISBN…"></div>
+        <select class="filter-sel" id="libCatFilter"><option value="">All categories</option><option>Leadership</option><option>Sales</option><option>Technology</option><option>Personal Development</option><option>Product</option><option>Finance</option><option>Marketing</option><option>Operations</option></select>
+        <select class="filter-sel" id="libLevelFilter"><option value="">All levels</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select>
+        <select class="filter-sel" id="libStatusFilter"><option value="">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Book</th><th>Category</th><th>Price</th><th>Level</th><th>Requested</th><th>Avg Rating</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="libraryTbody">
+            <tr><td colspan="8" class="td-sub" style="text-align:center;padding:32px">Loading catalogue…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ ANALYTICS ══ -->
+    <div class="tab-panel" id="tab-analytics">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Reading <em>Analytics</em></div>
+          <div class="page-sub">Q2 2026 · Apr 1 – Jun 30</div>
+        </div>
+        <select class="filter-sel">
+          <option>Q2 2026</option><option>Q1 2026</option><option>Q4 2025</option><option>Q3 2025</option>
+        </select>
+      </div>
+
+      <!-- KPI row -->
+      <div class="kpi-grid" style="margin-bottom:24px">
+        <div class="kpi">
+          <div class="kpi-label" style="color:var(--cyan-d)">Participation Rate</div>
+          <div class="kpi-val" style="color:var(--cyan)">68%</div>
+          <div class="kpi-delta up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>+8pp vs Q1</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" style="color:#34D399">Review Completion</div>
+          <div class="kpi-val" style="color:#34D399">71%</div>
+          <div class="kpi-delta up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>+12pp vs Q1</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" style="color:#F59E0B">Avg. Star Rating</div>
+          <div class="kpi-val" style="color:#F59E0B">4.6</div>
+          <div class="kpi-delta flat">Across 53 reviews</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" style="color:#818CF8">Budget Efficiency</div>
+          <div class="kpi-val" style="color:#818CF8">94%</div>
+          <div class="kpi-delta up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>$22.40 avg cost</div>
+        </div>
+      </div>
+
+      <div class="analytics-grid">
+        <!-- Dept participation -->
+        <div class="card">
+          <div class="card-hd"><span class="card-hd-title">Participation by Department</span></div>
+          <div class="card-body">
+            <div class="bar-chart" id="barChart">
+              <div class="bar-row"><span class="bar-label">Product</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--cyan)" data-w="88%"></div></div><span class="bar-val">88%</span></div>
+              <div class="bar-row"><span class="bar-label">Engineering</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#3B82F6" data-w="82%"></div></div><span class="bar-val">82%</span></div>
+              <div class="bar-row"><span class="bar-label">Sales</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#8B5CF6" data-w="74%"></div></div><span class="bar-val">74%</span></div>
+              <div class="bar-row"><span class="bar-label">Finance</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#10B981" data-w="68%"></div></div><span class="bar-val">68%</span></div>
+              <div class="bar-row"><span class="bar-label">Marketing</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#F59E0B" data-w="61%"></div></div><span class="bar-val">61%</span></div>
+              <div class="bar-row"><span class="bar-label">Operations</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#6366F1" data-w="55%"></div></div><span class="bar-val">55%</span></div>
+              <div class="bar-row"><span class="bar-label">HR &amp; People</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:#EF4444" data-w="42%"></div></div><span class="bar-val">42%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quarterly trend -->
+        <div class="card">
+          <div class="card-hd"><span class="card-hd-title">Quarterly Trend — Books Delivered</span></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:flex-end;gap:14px;height:120px;padding-bottom:24px;position:relative">
+              <div style="position:absolute;bottom:24px;left:0;right:0;top:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none">
+                <div style="border-top:1px dashed rgba(218,227,237,.06)"></div>
+                <div style="border-top:1px dashed rgba(218,227,237,.06)"></div>
+                <div style="border-top:1px dashed rgba(218,227,237,.06)"></div>
+              </div>
+              <div class="trend-col"><div class="trend-bar" style="height:52px;background:rgba(22,233,215,.2)"></div><span class="trend-lbl">Q3 '25</span><span style="font-size:11px;color:var(--m35)">38</span></div>
+              <div class="trend-col"><div class="trend-bar" style="height:68px;background:rgba(22,233,215,.3)"></div><span class="trend-lbl">Q4 '25</span><span style="font-size:11px;color:var(--m35)">48</span></div>
+              <div class="trend-col"><div class="trend-bar" style="height:60px;background:rgba(22,233,215,.3)"></div><span class="trend-lbl">Q1 '26</span><span style="font-size:11px;color:var(--m35)">44</span></div>
+              <div class="trend-col"><div class="trend-bar" style="height:76px;background:var(--cyan)"></div><span class="trend-lbl" style="color:var(--cyan)">Q2 '26</span><span style="font-size:11px;color:var(--cyan);font-weight:700">53</span></div>
+            </div>
+
+            <!-- Top categories -->
+            <div style="margin-top:8px;border-top:1px solid var(--m06);padding-top:16px">
+              <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--m20);margin-bottom:12px">Top Categories Q2</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--m55)">Leadership &amp; Management</span><span style="font-size:13px;font-weight:600;color:var(--m75)">34%</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--m55)">Personal Development</span><span style="font-size:13px;font-weight:600;color:var(--m75)">22%</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--m55)">Sales &amp; Negotiation</span><span style="font-size:13px;font-weight:600;color:var(--m75)">18%</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--m55)">Technology</span><span style="font-size:13px;font-weight:600;color:var(--m75)">14%</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--m55)">Other</span><span style="font-size:13px;font-weight:600;color:var(--m75)">12%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top books table -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-hd"><span class="card-hd-title">Most Requested Books — Q2 2026</span></div>
+        <div class="tbl-wrap" style="border:none;border-radius:0 0 16px 16px">
+          <table>
+            <thead><tr><th>#</th><th>Book</th><th>Category</th><th>Requests</th><th>Avg Rating</th><th>Review Rate</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--gold);font-weight:700;font-family:var(--font-d);font-size:18px">1</td><td><div class="td-primary">Atomic Habits</div><div class="td-sub">James Clear</div></td><td><span class="badge" style="background:rgba(139,92,246,.12);color:#A78BFA;border:1px solid rgba(139,92,246,.22)">Personal Dev.</span></td><td class="td-primary">52</td><td><span style="color:#F59E0B">★</span> <span class="td-primary">4.9</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="width:80px;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:84%;height:100%;background:#10B981;border-radius:99px"></div></div><span class="td-sub">84%</span></div></td></tr>
+              <tr><td style="color:var(--m35);font-weight:700;font-family:var(--font-d);font-size:18px">2</td><td><div class="td-primary">The Manager's Path</div><div class="td-sub">Camille Fournier</div></td><td><span class="badge" style="background:rgba(59,130,246,.12);color:#60A5FA;border:1px solid rgba(59,130,246,.22)">Leadership</span></td><td class="td-primary">34</td><td><span style="color:#F59E0B">★</span> <span class="td-primary">4.8</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="width:80px;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:76%;height:100%;background:#10B981;border-radius:99px"></div></div><span class="td-sub">76%</span></div></td></tr>
+              <tr><td style="color:var(--m35);font-weight:700;font-family:var(--font-d);font-size:18px">3</td><td><div class="td-primary">Radical Candor</div><div class="td-sub">Kim Scott</div></td><td><span class="badge" style="background:rgba(59,130,246,.12);color:#60A5FA;border:1px solid rgba(59,130,246,.22)">Leadership</span></td><td class="td-primary">28</td><td><span style="color:#F59E0B">★</span> <span class="td-primary">4.6</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="width:80px;height:4px;background:var(--track);border-radius:99px;overflow:hidden"><div style="width:71%;height:100%;background:var(--cyan);border-radius:99px"></div></div><span class="td-sub">71%</span></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+  if (!localStorage.getItem('gb_admin_session')) {
+    window.location.replace('./admin-login.html');
+  }
+
+  // ── State
+  let activeRejectRow = null;
+  let activeShipRow = null;
+  let activeQuotaRow = null;
+  let activeBookRow = null;
+  let bookModalIsNew = true;
+  let activeOrderViewRow = null;
+
+  const STATUS_FLOW = ['pending','approved','purchased','packaging','shipped','delivered'];
+  const STATUS_LABELS = { pending:'Pending', approved:'Approved', purchased:'Purchased', packaging:'Packaging', shipped:'Shipped', delivered:'Delivered', rejected:'Rejected' };
+  const STATUS_BADGE = { pending:'b-pending', approved:'b-approved', purchased:'b-purchased', packaging:'b-packaging', shipped:'b-shipped', delivered:'b-delivered', rejected:'b-rejected' };
+
+  const notifications = [
+    { dot:'#F59E0B', text:'<strong>Kevin Wang</strong> submitted a book request', time:'2 hours ago', unread:true },
+    { dot:'#10B981', text:'<strong>Sarah Lin</strong>\'s book was marked as shipped', time:'5 hours ago', unread:true },
+    { dot:'#F59E0B', text:'<strong>Aisha Karim</strong> submitted a book request', time:'Yesterday', unread:true },
+    { dot:'#10B981', text:'<strong>Marcus Chen</strong> received delivery', time:'Yesterday', unread:false },
+    { dot:'#8B5CF6', text:'<strong>Jamie Park</strong>\'s order is being packaged', time:'May 21', unread:false },
+  ];
+
+  // ── Cursor
+  const cur = document.getElementById('cur');
+  const curR = document.getElementById('curR');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+  (function t(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(t);})();
+  document.querySelectorAll('a,button,input[type="checkbox"],.kpi,.qa-btn,.tbl-check,.stab,.sb-item,.notif-item').forEach(el=>{
+    el.addEventListener('mouseenter',()=>cur.classList.add('x'));
+    el.addEventListener('mouseleave',()=>cur.classList.remove('x'));
+  });
+
+  // ── Toast
+  function toast(title, msg, type='info') {
+    const colors = { success:'#10B981', error:'#EF4444', info:'#16E9D7', warn:'#F59E0B' };
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = `<div class="toast-ico" style="background:${colors[type]}22;color:${colors[type]}"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
+    document.getElementById('toastWrap').appendChild(el);
+    requestAnimationFrame(()=>el.classList.add('show'));
+    setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),400); }, 3200);
+  }
+
+  // ── Notifications
+  function renderNotifications() {
+    const list = document.getElementById('notifList');
+    list.innerHTML = notifications.map(n=>`
+      <div class="notif-item${n.unread?' unread':''}">
+        <div class="notif-item-dot" style="background:${n.dot}"></div>
+        <div class="notif-item-body"><div class="notif-item-text">${n.text}</div><div class="notif-item-time">${n.time}</div></div>
+      </div>`).join('');
+    const unread = notifications.filter(n=>n.unread).length;
+    document.getElementById('notifDot').style.display = unread ? 'block' : 'none';
+  }
+  renderNotifications();
+  document.getElementById('notifBtn').addEventListener('click', e=>{
+    e.stopPropagation();
+    document.getElementById('notifPanel').classList.toggle('open');
+  });
+  document.getElementById('notifClearBtn').addEventListener('click', ()=>{
+    notifications.forEach(n=>n.unread=false);
+    renderNotifications();
+    toast('Notifications cleared', 'All notifications marked as read.', 'info');
+  });
+  document.addEventListener('click', ()=> document.getElementById('notifPanel').classList.remove('open'));
+
+  // ── Tab switching
+  function switchTab(name) {
+    document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+    const navItem = document.querySelector(`.sb-item[data-tab="${name}"]`);
+    if (navItem) navItem.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('tab-'+name).classList.add('active');
+    document.querySelector('.content').scrollTop=0;
+    const titles={overview:'Overview',orders:'Order Queue',employees:'Employees',library:'Book Library',analytics:'Analytics'};
+    const subs={overview:'Q2 2026 · Apr – Jun',orders:'Review and action book requests',employees:'Manage employee access and quotas',library:'Curated book catalogue',analytics:'Q2 2026 · Reading insights'};
+    document.getElementById('tbTitle').textContent=titles[name]||name;
+    document.getElementById('tbSub').textContent=subs[name]||'';
+    if (name==='analytics') animateBars();
+  }
+  document.querySelectorAll('.sb-item[data-tab]').forEach(item=>{
+    item.addEventListener('click',e=>{e.preventDefault();switchTab(item.dataset.tab);});
+  });
+  document.querySelectorAll('.act-btn[data-tab]').forEach(btn=>{
+    btn.addEventListener('click',()=>switchTab(btn.dataset.tab));
+  });
+
+  // ── Ripple
+  function addRipple(btn) {
+    btn.addEventListener('click',e=>{
+      const r=document.createElement('span');
+      const rect=btn.getBoundingClientRect();
+      const size=Math.max(rect.width,rect.height)*2;
+      r.className='ripple';r.style.cssText=`width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+      btn.appendChild(r);setTimeout(()=>r.remove(),500);
+    });
+  }
+  document.querySelectorAll('.btn,.tb-btn,.qa-btn').forEach(addRipple);
+
+  // ── Order helpers
+  function escOrderAttr(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function orderTabStatus(status) {
+    if (status === 'pending' || status === 'rejected' || status === 'delivered') return status;
+    return 'progress';
+  }
+
+  function renderOrderRow(order) {
+    const ui = order.ui;
+    const status = order.status || 'pending';
+    const orderJson = escOrderAttr(JSON.stringify(ui));
+    const badge = STATUS_BADGE[status] || 'b-pending';
+    const label = STATUS_LABELS[status] || status;
+    return `<tr data-status="${orderTabStatus(status)}" data-dept="${escOrderAttr(order.department)}" data-company="${escOrderAttr(order.company)}" data-order-id="${escOrderAttr(order.id)}" data-order="${orderJson}">
+      <td><input type="checkbox" class="tbl-check row-check" onchange="updateBulk()"></td>
+      <td><div style="display:flex;align-items:center;gap:10px"><div class="emp-av" style="background:${order.avatarGradient}">${escOrderAttr(order.initials)}</div><div><div class="td-primary">${escOrderAttr(order.employee)}</div><div class="td-sub">${escOrderAttr(order.department)} · ${escOrderAttr(order.company)}</div></div></div></td>
+      <td><div class="td-primary">${escOrderAttr(order.title)}</div><div class="td-sub">${escOrderAttr(order.author)}</div></td>
+      <td class="td-primary">${escOrderAttr(order.priceFormatted)}</td>
+      <td><span class="badge ${badge}"><span class="badge-dot"></span>${label}</span></td>
+      <td class="td-sub">${escOrderAttr(order.submittedShort)}</td>
+      <td></td>
+    </tr>`;
+  }
+
+  async function loadOrders() {
+    const tbody = document.getElementById('ordersTbody');
+    try {
+      const res = await fetch('/api/orders');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message || 'Failed to load orders');
+      if (!Array.isArray(data.orders) || !data.orders.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="td-sub" style="text-align:center;padding:32px">No orders yet. Employee submissions will appear here.</td></tr>';
+        updateCounts();
+        return;
+      }
+      tbody.innerHTML = data.orders.map(renderOrderRow).join('');
+      tbody.querySelectorAll('tr').forEach((row) => {
+        const status = getRowStatus(row);
+        renderActionCell(row, status, getOrderData(row));
+      });
+      updateCounts();
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="7" class="td-sub" style="text-align:center;padding:32px;color:#DC2626">${escLib(err.message)}</td></tr>`;
+    }
+  }
+
+  async function persistOrderStatus(row, status, extras = {}) {
+    const id = row?.dataset?.orderId;
+    if (!id) return;
+    try {
+      const res = await fetch(`/api/orders/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, ...extras }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || data.message || 'Could not save order status');
+      if (data.order?.ui) {
+        row.dataset.order = escOrderAttr(JSON.stringify(data.order.ui));
+      }
+    } catch (err) {
+      toast('Save failed', err.message, 'error');
+    }
+  }
+
+  function getRowStatus(row) {
+    const badge = row.querySelector('.badge');
+    if (!badge) return 'pending';
+    for (const [cls, st] of Object.entries(STATUS_BADGE)) {
+      if (badge.classList.contains(st)) return cls;
+    }
+    return row.dataset.status || 'pending';
+  }
+
+  function setRowStatus(row, status, extras = {}) {
+    const badge = row.querySelector('.badge');
+    if (badge) {
+      badge.className = `badge ${STATUS_BADGE[status]||'b-pending'}`;
+      badge.innerHTML = `<span class="badge-dot"></span>${STATUS_LABELS[status]||status}`;
+    }
+    if (status === 'pending' || status === 'rejected') row.dataset.status = status;
+    else if (status === 'delivered') row.dataset.status = 'delivered';
+    else row.dataset.status = 'progress';
+    renderActionCell(row, status, getOrderData(row));
+    updateCounts();
+    persistOrderStatus(row, status, extras);
+  }
+
+  function renderActionCell(row, status, order) {
+    order = order || getOrderData(row);
+    const actCell = row.querySelector('td:last-child');
+    if (!actCell) return;
+    const tracking = order.tracking || order.trackingNumber || '';
+    const map = {
+      pending: `<div style="display:flex;gap:6px"><button class="act-btn act-approve" onclick="approveOrder(this)"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Approve</button><button class="act-btn act-reject" onclick="openRejectModal(this)">Reject</button><button class="act-btn act-view" onclick="openOrderView(this)">View</button></div>`,
+      approved: `<button class="act-btn act-next" onclick="advanceStatus(this,'purchased')">Mark purchased</button>`,
+      purchased: `<button class="act-btn act-next" onclick="advanceStatus(this,'packaging')">Mark packaging</button>`,
+      packaging: `<button class="act-btn act-ship" onclick="openShipModal(this)"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Mark shipped</button>`,
+      shipped: `<div style="display:flex;gap:6px;align-items:center"><span class="td-sub">${tracking ? `SF Express · ${escOrderAttr(String(tracking).slice(0,10))}` : 'In transit'}</span><button class="act-btn act-next" onclick="markDelivered(this)">Mark delivered</button></div>`,
+      delivered: `<span class="td-sub">Review pending</span>`,
+      rejected: `<span class="td-sub" style="color:#F87171">✗ Rejected · Email sent</span>`,
+    };
+    actCell.innerHTML = map[status] || map.pending;
+  }
+
+  function advanceStatus(btn, nextStatus) {
+    const row = btn.closest('tr');
+    btn.disabled = true;
+    setTimeout(()=>{
+      setRowStatus(row, nextStatus);
+      const order = getOrderData(row);
+      toast('Status updated', `${order.book} → ${STATUS_LABELS[nextStatus]}`, 'success');
+    }, 500);
+  }
+
+  function approveOrder(btn) {
+    const row = btn.closest('tr');
+    btn.disabled = true;
+    setTimeout(()=>{
+      setRowStatus(row, 'approved');
+      const order = getOrderData(row);
+      toast('Order approved', `${order.employee} · ${order.book} — notification sent`, 'success');
+    }, 600);
+  }
+
+  function markDelivered(btn) {
+    const row = btn.closest('tr');
+    setRowStatus(row, 'delivered');
+    const order = getOrderData(row);
+    toast('Delivery confirmed', `${order.book} delivered to ${order.employee}`, 'success');
+  }
+
+  function getOrderData(row) {
+    try { return JSON.parse(row.dataset.order.replace(/&apos;/g,"'")); }
+    catch { return { employee:'Employee', book:'Book', id:'—' }; }
+  }
+
+  function updateCounts() {
+    const pending = document.querySelectorAll('#ordersTbody tr').length
+      ? [...document.querySelectorAll('#ordersTbody tr')].filter(r=>getRowStatus(r)==='pending').length
+      : 0;
+    document.getElementById('kpiPending').textContent = pending;
+    document.getElementById('sbOrderCnt').textContent = pending;
+    document.querySelectorAll('.stab[data-filter="pending"] .stab-n').forEach(el=>el.textContent=pending);
+    document.querySelector('.page-sub').textContent = `Q2 2026 · ${pending} orders awaiting your review · 52 days remaining in quarter`;
+  }
+
+  // ── Reject modal
+  function openRejectModal(btn) {
+    activeRejectRow = btn.closest('tr');
+    const order = getOrderData(activeRejectRow);
+    document.getElementById('rejectModalSub').textContent =
+      `Rejecting "${order.book}" for ${order.employee}. The employee will be notified by email.`;
+    openModal('rejectModal');
+  }
+
+  // ── Ship modal
+  function openShipModal(btn) {
+    activeShipRow = btn.closest('tr');
+    document.getElementById('trackingNum').value = '';
+    openModal('shipModal');
+  }
+
+  // ── Order detail view
+  function openOrderView(btn) {
+    activeOrderViewRow = btn ? btn.closest('tr') : activeOrderViewRow;
+    const row = activeOrderViewRow;
+    if (!row) return;
+    const order = getOrderData(row);
+    const status = getRowStatus(row);
+    document.getElementById('orderViewTitle').textContent = order.id || 'Order Details';
+    document.getElementById('orderViewSub').textContent = `${order.employee} · ${order.book} · ${order.price}`;
+    document.getElementById('orderReadingGoal').textContent = order.goal || '—';
+    document.getElementById('orderAiInput').textContent = order.aiInput ? `"${order.aiInput}"` : '—';
+
+    const steps = ['pending','approved','purchased','packaging','shipped','delivered'];
+    const curIdx = status === 'rejected' ? -1 : steps.indexOf(status);
+    document.getElementById('orderStatusSteps').innerHTML = steps.map((s,i)=>{
+      const cls = i < curIdx ? 'done' : i === curIdx ? 'current' : '';
+      const line = i < steps.length-1 ? `<div class="status-step-line${i < curIdx ? ' done':''}"></div>` : '';
+      return `<div class="status-step ${cls}"><div class="status-step-col"><div class="status-step-dot">${i+1}</div><div class="status-step-lbl">${STATUS_LABELS[s]}</div></div></div>${line}`;
+    }).join('');
+
+    document.getElementById('orderViewGrid').innerHTML = [
+      ['Employee', order.employee], ['Email', order.email],
+      ['Department', order.dept], ['Company', order.company],
+      ['Book', order.book], ['Author', order.author],
+      ['Price', order.price], ['Submitted', order.submitted],
+      ['Delivery address', order.address], ['Expected completion', order.completion],
+    ].map(([l,v])=>`<div class="modal-kv"><div class="modal-kv-lbl">${l}</div><div class="modal-kv-val">${v||'—'}</div></div>`).join('');
+
+    const actions = document.getElementById('orderViewActions');
+    if (status === 'pending') {
+      actions.innerHTML = `<button class="btn btn-cyan" onclick="setRowStatus(activeOrderViewRow,'approved');toast('Order approved','Employee notified.','success');closeModal('orderViewModal')">Approve order</button><button class="btn btn-danger" onclick="setRowStatus(activeOrderViewRow,'rejected');toast('Order rejected','Employee notified.','warn');closeModal('orderViewModal')">Reject</button>`;
+    } else if (status === 'approved') {
+      actions.innerHTML = `<button class="btn btn-cyan" onclick="setRowStatus(activeOrderViewRow,'purchased');toast('Status updated','Marked as purchased.','success');closeModal('orderViewModal')">Mark purchased</button>`;
+    } else if (status === 'purchased') {
+      actions.innerHTML = `<button class="btn btn-cyan" onclick="setRowStatus(activeOrderViewRow,'packaging');toast('Status updated','Marked as packaging.','success');closeModal('orderViewModal')">Mark packaging</button>`;
+    } else if (status === 'packaging') {
+      actions.innerHTML = `<button class="btn btn-cyan" onclick="closeModal('orderViewModal');openShipModal(activeOrderViewRow.querySelector('.act-ship')||{closest:()=>activeOrderViewRow})">Mark shipped</button>`;
+    } else {
+      actions.innerHTML = '';
+    }
+    openModal('orderViewModal');
+  }
+
+  // ── Employee profile
+  function openEmpProfile(btn) {
+    const row = btn.closest('tr');
+    const emp = JSON.parse(row.dataset.employee);
+    document.getElementById('empProfileAv').textContent = emp.initials;
+    document.getElementById('empProfileAv').style.background = emp.color;
+    document.getElementById('empProfileName').textContent = emp.name;
+    document.getElementById('empProfileMeta').textContent = `${emp.dept} · ${emp.company} · ${emp.email}`;
+    document.getElementById('empProfileStats').innerHTML = [
+      ['Q2 Status', emp.q2], ['Books read', emp.books], ['Review rate', emp.reviews], ['AI queries', Math.floor(Math.random()*4)+2],
+    ].map(([l,v])=>`<div class="modal-kv"><div class="modal-kv-lbl">${l}</div><div class="modal-kv-val">${v}</div></div>`).join('');
+    document.getElementById('empProfileHistory').innerHTML = (emp.history||[]).map(h=>`<div style="font-size:13px;color:var(--m55);padding:8px 12px;background:#F8FAFC;border-radius:8px;border:1px solid var(--m06)">${h}</div>`).join('');
+    activeQuotaRow = row;
+    document.getElementById('empOverrideBtn').onclick = ()=>{ closeModal('empProfileModal'); openQuotaModal(row); };
+    openModal('empProfileModal');
+  }
+
+  function openQuotaModal(btnOrRow) {
+    activeQuotaRow = btnOrRow.closest ? btnOrRow.closest('tr') : btnOrRow;
+    const emp = JSON.parse(activeQuotaRow.dataset.employee);
+    document.getElementById('quotaModalSub').textContent = `Adjust Q2 2026 quota for ${emp.name} (${emp.email}).`;
+    document.getElementById('quotaReason').value = '';
+    openModal('quotaModal');
+  }
+
+  function nudgeEmployee(btn) {
+    const emp = JSON.parse(btn.closest('tr').dataset.employee);
+    toast('Nudge sent', `Reminder email sent to ${emp.name} about unused Q2 quota.`, 'info');
+  }
+
+  // ── Book library
+  const LIB_CAT_STYLES = {
+    Leadership: 'background:rgba(37,99,235,.10);color:#2563EB;border:1px solid rgba(37,99,235,.20)',
+    Sales: 'background:rgba(16,185,129,.10);color:#059669;border:1px solid rgba(16,185,129,.22)',
+    Technology: 'background:rgba(14,165,233,.12);color:#0284C7;border:1px solid rgba(14,165,233,.22)',
+    'Personal Development': 'background:rgba(99,102,241,.10);color:#6366F1;border:1px solid rgba(99,102,241,.22)',
+    Product: 'background:rgba(236,72,153,.10);color:#DB2777;border:1px solid rgba(236,72,153,.22)',
+    Finance: 'background:rgba(34,197,94,.10);color:#059669;border:1px solid rgba(34,197,94,.22)',
+    Marketing: 'background:rgba(249,115,22,.10);color:#EA580C;border:1px solid rgba(249,115,22,.22)',
+    Operations: 'background:rgba(59,130,246,.10);color:#2563EB;border:1px solid rgba(59,130,246,.22)',
+  };
+  const LIB_CAT_LABEL = { 'Personal Development': 'Personal Dev.' };
+  let libraryBookCache = new Map();
+
+  function escLib(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function formatIsbn(isbn) {
+    const d = String(isbn || '').replace(/\D/g, '');
+    if (d.length === 13) return `${d.slice(0,3)}-${d.slice(3,4)}-${d.slice(4,7)}-${d.slice(7,12)}-${d.slice(12)}`;
+    return isbn || '—';
+  }
+
+  function renderLibraryRow(book) {
+    const isActive = book.status === 'active';
+    const catLabel = LIB_CAT_LABEL[book.category] || book.category;
+    const catStyle = LIB_CAT_STYLES[book.category] || LIB_CAT_STYLES.Leadership;
+    const actions = isActive
+      ? `<button class="act-btn act-view" onclick="openBookModal(this,false)">Edit</button><button class="act-btn act-reject" onclick="toggleBookStatus(this)">Disable</button>`
+      : `<button class="act-btn act-approve" onclick="toggleBookStatus(this)">Enable</button><button class="act-btn act-view" onclick="openBookModal(this,false)">Edit</button>`;
+    const statusBadge = isActive
+      ? '<span class="badge b-active lib-status"><span class="badge-dot"></span>Active</span>'
+      : '<span class="badge b-inactive lib-status">Inactive</span>';
+
+    return `<tr data-book-id="${escLib(book.id)}" data-category="${escLib(book.category)}" data-level="${escLib(book.level || book.difficulty)}" data-status="${book.status}">
+      <td><div><div class="td-primary">${escLib(book.title)}</div><div class="td-sub">${escLib(book.author)} · ISBN ${escLib(formatIsbn(book.isbn))}</div></div></td>
+      <td><span class="badge" style="${catStyle}">${escLib(catLabel)}</span></td>
+      <td class="td-primary">$${Number(book.price).toFixed(2)}</td>
+      <td class="td-sub">${escLib(book.level || book.difficulty)}</td>
+      <td class="td-primary">${book.requested}</td>
+      <td><span style="color:#F59E0B;font-weight:700;font-size:14px">★</span> <span class="td-primary">${book.rating}</span></td>
+      <td>${statusBadge}</td>
+      <td style="display:flex;gap:6px">${actions}</td>
+    </tr>`;
+  }
+
+  async function loadLibraryBooks() {
+    const tbody = document.getElementById('libraryTbody');
+    const sub = document.getElementById('libraryCountSub');
+    try {
+      const res = await fetch('/api/books');
+      const ct = res.headers.get('content-type') || '';
+      const raw = await res.text();
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (_parseErr) {
+        throw new Error(
+          res.status === 404
+            ? 'API not found — restart the server: cd server && npm start'
+            : 'Invalid response from server — make sure you open via http://localhost:3000/admin-dashboard.html'
+        );
+      }
+      if (!res.ok) throw new Error(data.error || data.message || 'Failed to load books');
+      if (!Array.isArray(data.books)) throw new Error('Catalogue data is missing from the server response');
+
+      libraryBookCache = new Map(data.books.map((b) => [b.id, b]));
+      tbody.innerHTML = data.books.map(renderLibraryRow).join('');
+      if (sub) sub.textContent = `${data.count || data.books.length} titles · Updated Apr 1, 2026`;
+      filterTable('libraryTbody', 'libSearch', [['libCatFilter', 'category'], ['libLevelFilter', 'level'], ['libStatusFilter', 'status']]);
+    } catch (err) {
+      const hint = err.message === 'Failed to fetch'
+        ? 'Cannot reach the server. Run: cd server && npm start, then open http://localhost:3000/admin-dashboard.html'
+        : err.message;
+      tbody.innerHTML = `<tr><td colspan="8" class="td-sub" style="text-align:center;padding:32px;color:#DC2626">${escLib(hint)}</td></tr>`;
+    }
+  }
+
+  function showBookBudgetAlert(result) {
+    const el = document.getElementById('bookBudgetAlert');
+    if (!result) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    if (result.withinBudget === false) {
+      el.style.background = 'rgba(220,38,38,.08)';
+      el.style.border = '1px solid rgba(220,38,38,.22)';
+      el.style.color = '#B91C1C';
+      el.textContent = result.message || `Over $${result.maxBudgetUsd || 80} budget — cannot add to catalogue.`;
+    } else if (result.withinBudget === true) {
+      el.style.background = 'rgba(5,150,105,.08)';
+      el.style.border = '1px solid rgba(5,150,105,.22)';
+      el.style.color = '#047857';
+      el.textContent = result.message || `Within budget at $${result.priceUsd?.toFixed(2)}.`;
+    } else {
+      el.style.background = 'rgba(217,119,6,.08)';
+      el.style.border = '1px solid rgba(217,119,6,.22)';
+      el.style.color = '#B45309';
+      el.textContent = result.message || 'Price not found on Google Books — enter catalogue price manually (must be ≤ $80).';
+    }
+  }
+
+  async function lookupBookByIsbn() {
+    const isbn = document.getElementById('bookIsbn').value.trim();
+    if (!isbn) { toast('ISBN required', 'Enter an ISBN to look up on Google Books.', 'error'); return; }
+    const btn = document.getElementById('bookLookupBtn');
+    btn.disabled = true;
+    btn.textContent = 'Looking up…';
+    try {
+      const res = await fetch('/api/books/lookup?isbn=' + encodeURIComponent(isbn));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.error || 'Lookup failed');
+      if (data.title) document.getElementById('bookTitle').value = data.title;
+      if (data.author) document.getElementById('bookAuthor').value = data.author;
+      if (data.priceUsd != null) document.getElementById('bookPrice').value = data.priceUsd.toFixed(2);
+      if (data.isbn) document.getElementById('bookIsbn').value = data.isbn;
+      showBookBudgetAlert({
+        withinBudget: data.withinBudget,
+        priceUsd: data.priceUsd,
+        maxBudgetUsd: data.maxBudgetUsd,
+        message: data.withinBudget === false
+          ? `Google Books price $${data.priceUsd?.toFixed(2)} exceeds $${data.maxBudgetUsd} — cannot add.`
+          : data.priceUsd != null
+            ? `Google Books: $${data.priceUsd.toFixed(2)} (${data.priceSource || 'google'}) — within budget.`
+            : 'No retail price on Google Books — enter price manually (≤ $80).',
+      });
+      toast('Book found', data.title || 'Metadata loaded from Google Books.', 'success');
+    } catch (err) {
+      showBookBudgetAlert(null);
+      toast('Lookup failed', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Look up';
+    }
+  }
+
+  document.getElementById('bookLookupBtn').addEventListener('click', lookupBookByIsbn);
+
+  function openBookModal(btnOrNew, isNew) {
+    bookModalIsNew = isNew !== false && btnOrNew === document.getElementById('addBookBtn');
+    activeBookRow = bookModalIsNew ? null : btnOrNew.closest('tr');
+    document.getElementById('bookModalTitle').textContent = bookModalIsNew ? 'Add Book' : 'Edit Book';
+    showBookBudgetAlert(null);
+    if (bookModalIsNew) {
+      ['bookTitle','bookAuthor','bookIsbn','bookPrice','bookKeywords'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('bookCategory').selectedIndex = 0;
+      document.getElementById('bookLevel').selectedIndex = 0;
+    } else {
+      const bookId = activeBookRow.dataset.bookId;
+      const b = libraryBookCache.get(bookId);
+      if (!b) { toast('Book not found', 'Reload the library and try again.', 'error'); return; }
+      document.getElementById('bookTitle').value = b.title;
+      document.getElementById('bookAuthor').value = b.author;
+      document.getElementById('bookIsbn').value = b.isbn || '';
+      document.getElementById('bookPrice').value = b.price;
+      document.getElementById('bookKeywords').value = Array.isArray(b.keywords) ? b.keywords.join(', ') : (b.keywords || '');
+      document.getElementById('bookCategory').value = b.category;
+      document.getElementById('bookLevel').value = b.level || b.difficulty;
+    }
+    openModal('bookModal');
+  }
+
+  function toggleBookStatus(btn) {
+    const row = btn.closest('tr');
+    const isActive = row.dataset.status === 'active';
+    row.dataset.status = isActive ? 'inactive' : 'active';
+    const badge = row.querySelector('.lib-status');
+    badge.className = isActive ? 'badge b-inactive lib-status' : 'badge b-active lib-status';
+    badge.innerHTML = isActive ? 'Inactive' : '<span class="badge-dot"></span>Active';
+    const actCell = row.querySelector('td:last-child');
+    if (isActive) {
+      actCell.innerHTML = `<button class="act-btn act-approve" onclick="toggleBookStatus(this)">Enable</button><button class="act-btn act-view" onclick="openBookModal(this,false)">Edit</button>`;
+      toast('Book disabled', 'Title removed from AI recommendations.', 'warn');
+    } else {
+      actCell.innerHTML = `<button class="act-btn act-view" onclick="openBookModal(this,false)">Edit</button><button class="act-btn act-reject" onclick="toggleBookStatus(this)">Disable</button>`;
+      toast('Book enabled', 'Title restored to active catalogue.', 'success');
+    }
+  }
+
+  document.getElementById('addBookBtn').addEventListener('click', ()=> openBookModal(document.getElementById('addBookBtn'), true));
+
+  // ── Modals
+  function openModal(id) { document.getElementById(id).classList.add('show'); }
+  function closeModal(id) {
+    if (id) document.getElementById(id).classList.remove('show');
+    else ['rejectModal','shipModal','orderViewModal','empProfileModal','quotaModal','bookModal'].forEach(i=>document.getElementById(i).classList.remove('show'));
+  }
+  document.querySelectorAll('.modal-overlay').forEach(o=>{
+    o.addEventListener('click',e=>{ if(e.target===o) closeModal(o.id); });
+  });
+
+  document.getElementById('confirmRejectBtn').addEventListener('click',()=>{
+    if (!document.getElementById('rejectReason').value) {
+      toast('Reason required', 'Please select a rejection reason.', 'error'); return;
+    }
+    if (activeRejectRow) setRowStatus(activeRejectRow, 'rejected');
+    closeModal('rejectModal');
+    toast('Order rejected', 'Employee has been notified by email.', 'warn');
+  });
+
+  document.getElementById('confirmShipBtn').addEventListener('click',()=>{
+    const tracking = document.getElementById('trackingNum').value.trim() || '1Z999AA10123456784';
+    if (activeShipRow) {
+      setRowStatus(activeShipRow, 'shipped', { trackingNumber: tracking });
+    }
+    closeModal('shipModal');
+    toast('Shipment confirmed', `Tracking ${tracking} sent to employee.`, 'success');
+  });
+
+  document.getElementById('confirmQuotaBtn').addEventListener('click',()=>{
+    const reason = document.getElementById('quotaReason').value.trim();
+    if (!reason) { toast('Reason required', 'Audit log requires a reason for quota overrides.', 'error'); return; }
+    const action = document.getElementById('quotaAction').value;
+    const emp = JSON.parse(activeQuotaRow.dataset.employee);
+    const labels = { extend:'Quota extended', cancel:'Quota cancelled', reset:'Quota reset to available' };
+    toast(labels[action], `${emp.name} — override logged for audit.`, 'success');
+    closeModal('quotaModal');
+  });
+
+  document.getElementById('confirmBookBtn').addEventListener('click', async ()=>{
+    const title = document.getElementById('bookTitle').value.trim();
+    const author = document.getElementById('bookAuthor').value.trim();
+    const price = document.getElementById('bookPrice').value;
+    const isbn = document.getElementById('bookIsbn').value.trim();
+    if (!title || !author || !price) { toast('Missing fields', 'Title, author, and price are required.', 'error'); return; }
+    if (+price > 80) { toast('Over budget', 'Books over $80 cannot be added to the catalogue.', 'error'); return; }
+
+    const btn = document.getElementById('confirmBookBtn');
+    btn.disabled = true;
+
+    try {
+      const checkRes = await fetch('/api/books/check-budget', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isbn, title, author, price: +price }),
+      });
+      const check = await checkRes.json();
+      showBookBudgetAlert(check);
+      if (check.withinBudget === false) {
+        toast('Over budget', check.message || 'Google Books price exceeds $80.', 'error');
+        return;
+      }
+
+      if (bookModalIsNew) {
+        const res = await fetch('/api/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title, author, isbn, price: +price,
+            category: document.getElementById('bookCategory').value,
+            difficulty: document.getElementById('bookLevel').value,
+            keywords: document.getElementById('bookKeywords').value,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || data.error || 'Save failed');
+        toast('Book added', `"${title}" added to library catalogue.`, 'success');
+        await loadLibraryBooks();
+      } else {
+        toast('Book updated', `"${title}" saved successfully.`, 'success');
+      }
+      closeModal('bookModal');
+    } catch (err) {
+      toast('Save failed', err.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ── Bulk approve
+  function toggleSelectAll(cb) {
+    document.querySelectorAll('.row-check').forEach(c=>{ c.checked = cb.checked; });
+    updateBulk();
+  }
+  function updateBulk() {
+    const checked = document.querySelectorAll('.row-check:checked').length;
+    const bar = document.getElementById('bulkBar');
+    if (checked>0) { bar.classList.add('show'); document.getElementById('bulkCount').textContent=checked; }
+    else bar.classList.remove('show');
+  }
+  function clearSelection() {
+    document.querySelectorAll('.row-check,#selectAll').forEach(c=>c.checked=false);
+    document.getElementById('bulkBar').classList.remove('show');
+  }
+  function bulkApproveSelected() {
+    let n = 0;
+    document.querySelectorAll('.row-check:checked').forEach(cb=>{
+      const row = cb.closest('tr');
+      if (getRowStatus(row)==='pending') { setRowStatus(row,'approved'); n++; }
+    });
+    clearSelection();
+    toast('Bulk approved', `${n} order${n!==1?'s':''} approved and employees notified.`, 'success');
+  }
+  function bulkApproveAll() {
+    let n = 0;
+    document.querySelectorAll('#ordersTbody tr').forEach(row=>{
+      if (getRowStatus(row)==='pending') { setRowStatus(row,'approved'); n++; }
+    });
+    toast('All eligible approved', `${n} pending orders approved.`, 'success');
+  }
+
+  // ── Status filter tabs
+  document.querySelectorAll('.stab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('.stab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      filterOrders();
+    });
+  });
+
+  // ── Search & filter
+  function filterTable(tbodyId, searchId, filters) {
+    const q = (document.getElementById(searchId)?.value || '').toLowerCase();
+    document.querySelectorAll(`#${tbodyId} tr`).forEach(row=>{
+      const text = row.textContent.toLowerCase();
+      let show = !q || text.includes(q);
+      filters.forEach(([sel, attr])=>{
+        const val = document.getElementById(sel)?.value;
+        if (val && row.dataset[attr] !== val) show = false;
+      });
+      row.style.display = show ? '' : 'none';
+    });
+  }
+
+  function filterOrders() {
+    const filter = document.querySelector('.stab.active')?.dataset.filter || 'all';
+    document.querySelectorAll('#ordersTbody tr').forEach(row=>{
+      const st = row.dataset.status;
+      const status = getRowStatus(row);
+      let tabOk = filter==='all' || (filter==='pending'&&status==='pending') || (filter==='progress'&&st==='progress') || (filter==='delivered'&&st==='delivered');
+      row.dataset._tabHidden = tabOk ? '0' : '1';
+    });
+    const q = (document.getElementById('ordersSearch')?.value||'').toLowerCase();
+    const dept = document.getElementById('ordersDeptFilter')?.value;
+    const co = document.getElementById('ordersCoFilter')?.value;
+    document.querySelectorAll('#ordersTbody tr').forEach(row=>{
+      let show = row.dataset._tabHidden !== '1';
+      if (show && q && !row.textContent.toLowerCase().includes(q)) show = false;
+      if (show && dept && row.dataset.dept !== dept) show = false;
+      if (show && co && row.dataset.company !== co) show = false;
+      row.style.display = show ? '' : 'none';
+    });
+  }
+
+  ['ordersSearch','ordersDeptFilter','ordersCoFilter'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input', filterOrders);
+    document.getElementById(id)?.addEventListener('change', filterOrders);
+  });
+
+  ['empSearch','empDeptFilter','empCoFilter','empStatusFilter'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input', ()=> filterTable('employeesTbody','empSearch',[['empDeptFilter','dept'],['empCoFilter','company'],['empStatusFilter','status']]));
+    document.getElementById(id)?.addEventListener('change', ()=> filterTable('employeesTbody','empSearch',[['empDeptFilter','dept'],['empCoFilter','company'],['empStatusFilter','status']]));
+  });
+
+  ['libSearch','libCatFilter','libLevelFilter','libStatusFilter'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('input', ()=> filterTable('libraryTbody','libSearch',[['libCatFilter','category'],['libLevelFilter','level'],['libStatusFilter','status']]));
+    document.getElementById(id)?.addEventListener('change', ()=> filterTable('libraryTbody','libSearch',[['libCatFilter','category'],['libLevelFilter','level'],['libStatusFilter','status']]));
+  });
+
+  // ── Export CSV
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    const rows = [['Employee','Book','Price','Status','Department','Company']];
+    document.querySelectorAll('#ordersTbody tr').forEach(tr=>{
+      const o = getOrderData(tr);
+      rows.push([o.employee,o.book,o.price,getRowStatus(tr),o.dept,o.company]);
+    });
+    const csv = rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download = 'startrader-orders-q2-2026.csv';
+    a.click();
+    toast('Export complete', 'Q2 order report downloaded as CSV.', 'success');
+  });
+
+  // ── Analytics bar chart
+  function animateBars() {
+    setTimeout(()=>{
+      document.querySelectorAll('.bar-fill').forEach(b=>{ b.style.width = b.dataset.w || '0%'; });
+    },100);
+  }
+
+  // ── Init
+  loadOrders();
+  loadLibraryBooks();
+
+  document.getElementById('adminSignOut').addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('gb_admin_session');
+    window.location.href = './admin-login.html';
+  });
+</script>
+</body>
+</html>

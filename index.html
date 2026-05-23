@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reading Growth Program — STARTRADER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+  <style>
+  /* ══════════════════════════════════════════
+     TOKENS
+  ══════════════════════════════════════════ */
+  :root {
+    --navy:        #0F1147;
+    --navy-mid:    #161B5E;
+    --navy-light:  #222980;
+    --cyan:        #16E9D7;
+    --cyan-dim:    #5DD8CC;
+    --blue:        #0047BB;
+    --mist:        #DAE3ED;
+
+    --paper:       #FAF7F2;
+    --paper-2:     #F3EDE4;
+    --paper-3:     #EDE4D8;
+    --gb-ink:      #1A130C;
+    --gb-mid:      #574739;
+    --gb-light:    #9A8A78;
+    --gb-faint:    #D0C4B2;
+    --gb-border:   #E4D9CC;
+
+    --amber:       #C07328;
+    --amber-deep:  #8C4E10;
+    --amber-light: #FDF2E4;
+    --gold:        #E8A83A;
+
+    --grad-hero:   linear-gradient(135deg, #1C1860 0%, #0F1147 45%, #0A0D38 100%);
+    --grad-momentum: linear-gradient(135deg, #0F1147 0%, #0047BB 55%, #16E9D7 100%);
+    --grad-warm:   linear-gradient(135deg, #FAF7F2 0%, #EDE4D8 100%);
+    --grad-amber:  linear-gradient(135deg, #C07328 0%, #8C4E10 100%);
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui:      'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+
+    --shadow-xs:   0 1px 4px rgba(15,17,71,.06);
+    --shadow-sm:   0 3px 10px rgba(15,17,71,.10);
+    --shadow-md:   0 8px 24px rgba(15,17,71,.13);
+    --shadow-lg:   0 20px 52px rgba(15,17,71,.20);
+    --shadow-xl:   0 36px 88px rgba(0,0,0,.40);
+    --shadow-warm: 0 10px 36px rgba(192,115,40,.18);
+    --shadow-cyan: 0 10px 36px rgba(22,233,215,.14);
+
+    --r-card:  20px;
+    --r-btn:   10px;
+    --ease-out: cubic-bezier(.16,1,.3,1);
+  }
+
+  /* ══════════════════════════════════════════
+     RESET & BASE
+  ══════════════════════════════════════════ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-ui);
+    background: var(--navy);
+    color: #fff;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    cursor: none;
+  }
+  a { text-decoration: none; color: inherit; }
+  img { display: block; max-width: 100%; }
+
+  /* ── Custom cursor ── */
+  .cursor {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cyan);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: width .2s var(--ease-out), height .2s var(--ease-out), background .2s;
+    mix-blend-mode: difference;
+  }
+  .cursor.expand { width: 36px; height: 36px; background: rgba(22,233,215,.22); }
+  .cursor-ring {
+    position: fixed; top: 0; left: 0; z-index: 9998;
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid rgba(22,233,215,.35);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: transform .12s linear, width .22s var(--ease-out), height .22s var(--ease-out), opacity .2s;
+  }
+
+  /* ══════════════════════════════════════════
+     NAV
+  ══════════════════════════════════════════ */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 60px; height: 84px;
+    background: rgba(15,17,71,.6);
+    backdrop-filter: blur(24px) saturate(1.8);
+    border-bottom: 1px solid rgba(218,227,237,.06);
+    transition: background .4s var(--ease-out), height .4s var(--ease-out), border-color .4s;
+  }
+  .nav.scrolled {
+    height: 68px;
+    background: rgba(10,12,52,.92);
+    border-color: rgba(218,227,237,.1);
+    box-shadow: 0 4px 24px rgba(0,0,0,.25);
+  }
+
+  .nav-logo {
+    display: flex; align-items: center;
+    transition: opacity .2s;
+  }
+  .nav-logo:hover { opacity: .85; }
+  .nav-logo img {
+    height: 56px; width: auto;
+    transition: height .4s var(--ease-out);
+  }
+  .nav.scrolled .nav-logo img { height: 44px; }
+
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--font-ui); font-weight: 600; border: none;
+    cursor: none; transition: all .2s var(--ease-out); white-space: nowrap;
+    line-height: 1; position: relative; overflow: hidden;
+  }
+  .btn:active { transform: scale(.96) !important; }
+
+  /* Shimmer overlay */
+  .btn::after {
+    content: '';
+    position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+    transform: skewX(-15deg);
+    transition: left .55s var(--ease-out);
+    pointer-events: none;
+  }
+  .btn:hover::after { left: 150%; }
+
+  .btn-ghost {
+    padding: 10px 22px; font-size: 13.5px; border-radius: var(--r-btn);
+    background: transparent; color: rgba(255,255,255,.65);
+    border: 1px solid rgba(218,227,237,.18);
+  }
+  .btn-ghost:hover {
+    color: #fff; border-color: rgba(218,227,237,.4);
+    background: rgba(255,255,255,.06);
+    transform: translateY(-1px);
+  }
+
+  .btn-cyan {
+    padding: 10px 22px; font-size: 13.5px; border-radius: var(--r-btn);
+    background: var(--cyan); color: var(--navy);
+  }
+  .btn-cyan:hover {
+    background: #3eeedd;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-cyan);
+  }
+
+  .btn-admin-nav {
+    padding: 10px 18px; font-size: 13px; border-radius: var(--r-btn);
+    background: transparent; color: rgba(22,233,215,.62);
+    border: 1px solid rgba(22,233,215,.22);
+  }
+  .btn-admin-nav:hover {
+    color: var(--cyan); border-color: rgba(22,233,215,.45);
+    background: rgba(22,233,215,.06);
+    transform: translateY(-1px);
+  }
+
+  .btn-amber {
+    padding: 15px 30px; font-size: 15px; border-radius: var(--r-btn);
+    background: var(--grad-amber); color: #fff;
+    box-shadow: 0 4px 16px rgba(192,115,40,.25);
+  }
+  .btn-amber:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 36px rgba(192,115,40,.38);
+  }
+
+  .btn-outline-dark {
+    padding: 15px 30px; font-size: 15px; border-radius: var(--r-btn);
+    background: transparent; color: var(--gb-mid);
+    border: 1.5px solid var(--gb-border);
+  }
+  .btn-outline-dark:hover { border-color: var(--amber); color: var(--amber); transform: translateY(-2px); }
+
+  .btn-outline-light {
+    padding: 15px 30px; font-size: 15px; border-radius: var(--r-btn);
+    background: transparent; color: rgba(218,227,237,.7);
+    border: 1px solid rgba(218,227,237,.22);
+  }
+  .btn-outline-light:hover { border-color: rgba(218,227,237,.5); color: rgba(218,227,237,.95); transform: translateY(-2px); }
+
+  /* Ripple */
+  .ripple {
+    position: absolute; border-radius: 50%;
+    transform: scale(0); background: rgba(255,255,255,.25);
+    animation: rippleOut .55s var(--ease-out) forwards;
+    pointer-events: none;
+  }
+  @keyframes rippleOut { to { transform: scale(4); opacity: 0; } }
+
+  /* ══════════════════════════════════════════
+     HERO
+  ══════════════════════════════════════════ */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 54fr 46fr;
+    align-items: center; gap: 56px;
+    padding: 84px 60px 0;
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(ellipse 85% 75% at 25% 45%, #242090 0%, transparent 55%),
+      radial-gradient(ellipse 65% 65% at 75% 65%, #0A2B70 0%, transparent 60%),
+      var(--grad-hero);
+  }
+
+  /* Warm amber fog — left side */
+  .hero-bg-amber {
+    position: absolute; top: -5%; left: -10%;
+    width: 760px; height: 760px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,115,40,.22) 0%, rgba(192,115,40,.06) 45%, transparent 65%);
+    pointer-events: none;
+    animation: driftA 18s ease-in-out infinite;
+  }
+  /* Cyan glow — right side */
+  .hero-bg-cyan {
+    position: absolute; bottom: 0%; right: -8%;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(22,233,215,.12) 0%, transparent 58%);
+    pointer-events: none;
+    animation: driftB 14s ease-in-out infinite;
+  }
+  /* Gold centre highlight */
+  .hero-bg-gold {
+    position: absolute; top: 30%; left: 22%;
+    width: 380px; height: 280px;
+    background: radial-gradient(ellipse, rgba(232,168,58,.07) 0%, transparent 65%);
+    border-radius: 50%; pointer-events: none;
+  }
+  @keyframes driftA { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,-20px) scale(1.04)} }
+  @keyframes driftB { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,16px)} }
+
+  /* Grid overlay */
+  .hero-grid-overlay {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(218,227,237,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(218,227,237,.03) 1px, transparent 1px);
+    background-size: 56px 56px;
+    pointer-events: none;
+  }
+  /* Noise grain */
+  .hero-grain {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px 200px; opacity: .55;
+    pointer-events: none;
+  }
+  /* Bottom fade into next section */
+  .hero-bottom-fade {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 140px;
+    background: linear-gradient(0deg, var(--navy) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* ── Left ── */
+  .hero-left {
+    position: relative; z-index: 2;
+    padding: 100px 0 88px;
+  }
+
+  .hero-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 16px 8px 11px;
+    background: rgba(22,233,215,.07);
+    border: 1px solid rgba(22,233,215,.18);
+    border-radius: 99px;
+    font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+    color: var(--cyan); letter-spacing: .05em;
+    margin-bottom: 44px;
+    opacity: 0; animation: fadeUp .6s var(--ease-out) forwards; animation-delay: .1s;
+  }
+  .hero-pill-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--cyan); flex-shrink: 0;
+    box-shadow: 0 0 8px var(--cyan);
+    animation: pulse 2.4s ease infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(54px, 5.8vw, 84px);
+    font-weight: 700; line-height: 1.01;
+    margin-bottom: 34px;
+    letter-spacing: -.5px;
+  }
+  .hero-headline .ln {
+    display: block;
+    opacity: 0; animation: fadeUp .75s var(--ease-out) forwards;
+  }
+  .ln-1 { color: rgba(255,255,255,.96); animation-delay: .22s; }
+  .ln-2 { color: var(--gold); font-style: italic; animation-delay: .38s; }
+  .ln-3 { color: rgba(255,255,255,.96); animation-delay: .54s; }
+  .ln-4 { color: rgba(255,255,255,.96); animation-delay: .70s; }
+
+  .hero-body {
+    font-family: var(--font-body); font-size: 17px; font-weight: 300; line-height: 1.82;
+    color: rgba(218,227,237,.82); max-width: 440px; margin-bottom: 48px;
+    opacity: 0; animation: fadeUp .7s var(--ease-out) forwards; animation-delay: .9s;
+  }
+
+  .hero-ctas {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    opacity: 0; animation: fadeUp .7s var(--ease-out) forwards; animation-delay: 1.06s;
+  }
+  .hero-cta-note {
+    font-family: var(--font-ui); font-size: 13px; color: rgba(218,227,237,.4);
+    line-height: 1.7;
+  }
+  .hero-cta-note strong { color: rgba(218,227,237,.72); display: block; }
+
+  /* ── Right / Mockup ── */
+  .hero-right {
+    position: relative; z-index: 2;
+    display: flex; justify-content: center; align-items: center;
+    padding: 80px 0;
+    opacity: 0; animation: fadeUp .8s var(--ease-out) forwards; animation-delay: .5s;
+  }
+
+  .mockup-wrap { position: relative; width: 100%; max-width: 400px; }
+
+  .mockup {
+    background: rgba(14,16,34,.92);
+    border: 1px solid rgba(218,227,237,.1);
+    border-radius: 24px; padding: 26px;
+    backdrop-filter: blur(32px);
+    box-shadow: var(--shadow-xl), 0 0 0 1px rgba(22,233,215,.03), inset 0 1px 0 rgba(255,255,255,.05);
+    animation: floatCard 9s ease-in-out infinite;
+  }
+  @keyframes floatCard {
+    0%,100% { transform: translateY(0) rotate(-.3deg); }
+    50%      { transform: translateY(-16px) rotate(.3deg); }
+  }
+
+  /* Mockup internals */
+  .mk-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .mk-label { font-family: var(--font-ui); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .11em; color: rgba(218,227,237,.36); }
+  .mk-chip { font-family: var(--font-ui); font-size: 10px; font-weight: 700; background: var(--cyan); color: var(--navy); padding: 4px 11px; border-radius: 99px; letter-spacing: .05em; }
+
+  .mk-quota {
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(135deg, rgba(22,29,80,.8), rgba(15,17,71,.6));
+    border: 1px solid rgba(218,227,237,.07);
+    border-radius: 14px; padding: 14px 18px; margin-bottom: 14px;
+  }
+  .mk-q-val { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--gold); line-height: 1; }
+  .mk-q-sub { font-family: var(--font-ui); font-size: 11px; color: rgba(218,227,237,.35); margin-top: 4px; }
+  .mk-q-right { text-align: right; }
+  .mk-q-days { font-family: var(--font-ui); font-size: 22px; font-weight: 700; color: #fff; line-height: 1; }
+  .mk-q-dlabel { font-family: var(--font-ui); font-size: 11px; color: rgba(218,227,237,.35); margin-top: 4px; }
+
+  .mk-input {
+    background: rgba(22,29,80,.5); border: 1px solid rgba(218,227,237,.07);
+    border-radius: 12px; padding: 13px 15px; margin-bottom: 14px;
+  }
+  .mk-input-lbl { font-family: var(--font-ui); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .09em; color: rgba(218,227,237,.3); margin-bottom: 8px; }
+  .mk-input-text { font-family: var(--font-body); font-style: italic; font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.6; }
+
+  .mk-divider { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; }
+  .mk-divider-line { flex: 1; height: 1px; background: rgba(218,227,237,.07); }
+  .mk-divider-txt { font-family: var(--font-ui); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--cyan); }
+
+  .mk-book {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 12px; border-radius: 12px; margin-bottom: 8px;
+    border: 1px solid rgba(218,227,237,.06);
+    background: rgba(22,29,80,.3);
+    transition: border-color .25s, background .25s;
+  }
+  .mk-book:first-of-type { border-color: rgba(22,233,215,.2); background: rgba(22,233,215,.04); }
+  .mk-book:last-child { margin-bottom: 0; }
+  .mk-book:hover { border-color: rgba(218,227,237,.14); background: rgba(22,29,80,.5); }
+
+  .mk-cover {
+    width: 42px; min-width: 42px; height: 58px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-style: italic; font-size: 8px;
+    color: rgba(255,255,255,.9); text-align: center; line-height: 1.3; padding: 5px;
+  }
+  .c1 { background: linear-gradient(155deg,#1b3c5e,#2e6ca8); }
+  .c2 { background: linear-gradient(155deg,#28401a,#4d8030); }
+  .c3 { background: linear-gradient(155deg,#3e1c2e,#7d3050); }
+
+  .mk-book-body { flex: 1; min-width: 0; }
+  .mk-rank { font-family: var(--font-ui); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .11em; color: var(--cyan); margin-bottom: 3px; }
+  .mk-title { font-family: var(--font-display); font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+  .mk-author { font-family: var(--font-ui); font-size: 10px; color: rgba(218,227,237,.38); margin-bottom: 7px; }
+  .mk-bar-row { display: flex; align-items: center; gap: 7px; }
+  .mk-track { flex: 1; height: 2.5px; background: rgba(218,227,237,.09); border-radius: 99px; overflow: hidden; }
+  .mk-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan)); border-radius: 99px; }
+  .mk-pct { font-family: var(--font-ui); font-size: 10px; font-weight: 700; color: var(--cyan); }
+
+  /* Floating chips */
+  .chip {
+    position: absolute;
+    background: rgba(14,16,34,.96);
+    border: 1px solid rgba(218,227,237,.11);
+    border-radius: 16px;
+    padding: 11px 18px; backdrop-filter: blur(18px);
+    box-shadow: 0 12px 36px rgba(0,0,0,.35);
+  }
+  .chip-a { top: -24px; right: -40px; animation: chipA 5.5s ease-in-out infinite; }
+  .chip-b { bottom: -20px; left: -40px; animation: chipB 7.2s ease-in-out infinite; }
+  @keyframes chipA { 0%,100%{transform:translateY(0) rotate(-.5deg)} 50%{transform:translateY(-10px) rotate(.5deg)} }
+  @keyframes chipB { 0%,100%{transform:translateY(0) rotate(.5deg)} 50%{transform:translateY(-12px) rotate(-.5deg)} }
+  .chip-val { font-family: var(--font-display); font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+  .chip-lbl { font-family: var(--font-ui); font-size: 10px; color: rgba(218,227,237,.42); }
+  .chip-a .chip-val { color: var(--gold); }
+  .chip-b .chip-val { color: var(--cyan); }
+
+  /* ══════════════════════════════════════════
+     STATS BAND
+  ══════════════════════════════════════════ */
+  .stats {
+    background: var(--grad-momentum);
+    display: grid; grid-template-columns: repeat(4,1fr);
+    position: relative; overflow: hidden;
+  }
+  .stats::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(0,0,0,.08);
+  }
+  .stats::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(22,233,215,.5) 50%, transparent 100%);
+  }
+  .stat {
+    padding: 48px 28px; text-align: center; position: relative; z-index: 1;
+    border-right: 1px solid rgba(255,255,255,.08);
+    transition: background .3s;
+  }
+  .stat:last-child { border-right: none; }
+  .stat:hover { background: rgba(255,255,255,.04); }
+  .stat-num {
+    font-family: var(--font-display); font-size: 58px; font-weight: 700;
+    color: #fff; line-height: 1; margin-bottom: 10px;
+  }
+  .stat-num em { color: var(--cyan); font-style: normal; }
+  .stat-lbl {
+    font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .1em;
+    color: rgba(218,227,237,.48);
+  }
+
+  /* ══════════════════════════════════════════
+     SHARED SECTION STYLES
+  ══════════════════════════════════════════ */
+  .sec-eyebrow {
+    font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--amber); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sec-eyebrow::before {
+    content: ''; display: block; width: 24px; height: 1.5px;
+    background: var(--amber); border-radius: 99px;
+  }
+  .sec-title {
+    font-family: var(--font-display); font-weight: 700; line-height: 1.08;
+    font-size: clamp(36px, 3.8vw, 52px);
+    color: var(--gb-ink); margin-bottom: 18px;
+  }
+  .sec-title em { color: var(--amber); font-style: italic; }
+  .sec-sub {
+    font-family: var(--font-body); font-size: 16px; font-weight: 300; line-height: 1.78;
+    color: var(--gb-mid); max-width: 560px;
+  }
+
+  /* Reveal animation base */
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
+  }
+  .reveal.on { opacity: 1; transform: translateY(0); }
+
+  /* ══════════════════════════════════════════
+     HOW IT WORKS
+  ══════════════════════════════════════════ */
+  .how {
+    background: var(--paper);
+    padding: 128px 60px;
+  }
+  .how-hd { margin-bottom: 80px; }
+
+  .steps {
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 0; position: relative;
+  }
+  .steps::before {
+    content: ''; position: absolute;
+    top: 26px; left: calc(12.5% + 18px); right: calc(12.5% + 18px);
+    height: 1px;
+    background: linear-gradient(90deg, rgba(192,115,40,.15), rgba(22,233,215,.3), rgba(192,115,40,.15));
+    z-index: 0;
+  }
+
+  .step {
+    padding: 0 28px; position: relative;
+  }
+  .step-num-wrap {
+    width: 54px; height: 54px; border-radius: 50%; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--navy); border: 1.5px solid rgba(22,233,215,.25);
+    position: relative; z-index: 1;
+    transition: border-color .3s, box-shadow .3s, transform .35s var(--ease-out);
+  }
+  .step:hover .step-num-wrap {
+    border-color: rgba(22,233,215,.6);
+    box-shadow: 0 0 0 6px rgba(22,233,215,.07), var(--shadow-cyan);
+    transform: scale(1.06);
+  }
+  .step-num {
+    font-family: var(--font-ui); font-size: 13px; font-weight: 700;
+    color: var(--cyan); letter-spacing: .05em;
+    transition: color .3s;
+  }
+
+  .step-icon {
+    width: 46px; height: 46px; border-radius: 13px;
+    background: var(--amber-light);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    transition: background .3s, transform .35s var(--ease-out);
+  }
+  .step-icon svg { width: 22px; height: 22px; stroke: var(--amber); stroke-width: 1.75; fill: none; transition: stroke .3s; }
+  .step:hover .step-icon { background: var(--amber); transform: rotate(-4deg) scale(1.08); }
+  .step:hover .step-icon svg { stroke: #fff; }
+
+  .step-title {
+    font-family: var(--font-display); font-size: 21px; font-weight: 600;
+    color: var(--gb-ink); margin-bottom: 13px; line-height: 1.2;
+    transition: color .2s;
+  }
+  .step:hover .step-title { color: var(--amber-deep); }
+  .step-body {
+    font-family: var(--font-body); font-size: 14px; line-height: 1.82;
+    color: var(--gb-mid);
+  }
+
+  /* ══════════════════════════════════════════
+     BENEFITS
+  ══════════════════════════════════════════ */
+  .benefits {
+    background: var(--paper-2); padding: 100px 60px 128px;
+    border-top: 1px solid var(--gb-border);
+  }
+  .benefits-hd { margin-bottom: 56px; }
+
+  .benefits-grid {
+    display: grid; grid-template-columns: repeat(3,1fr);
+    gap: 22px;
+  }
+
+  .benefit-card {
+    background: #fff; border: 1px solid var(--gb-border);
+    border-radius: var(--r-card); padding: 34px;
+    transition: border-color .3s, box-shadow .35s var(--ease-out), transform .35s var(--ease-out);
+    position: relative; overflow: hidden;
+  }
+  .benefit-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--grad-amber);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform .38s var(--ease-out);
+  }
+  .benefit-card:hover {
+    border-color: rgba(192,115,40,.3);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-warm), var(--shadow-md);
+  }
+  .benefit-card:hover::before { transform: scaleX(1); }
+
+  .benefit-ico {
+    width: 54px; height: 54px; border-radius: 15px;
+    background: var(--amber-light);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+    transition: background .3s, transform .35s var(--ease-out);
+  }
+  .benefit-ico svg { width: 25px; height: 25px; stroke: var(--amber); stroke-width: 1.75; fill: none; transition: stroke .3s; }
+  .benefit-card:hover .benefit-ico { background: var(--amber); transform: rotate(5deg) scale(1.08); }
+  .benefit-card:hover .benefit-ico svg { stroke: #fff; }
+
+  .benefit-title {
+    font-family: var(--font-display); font-size: 21px; font-weight: 600;
+    color: var(--gb-ink); margin-bottom: 11px; line-height: 1.2;
+  }
+  .benefit-body {
+    font-family: var(--font-body); font-size: 14px; line-height: 1.82;
+    color: var(--gb-mid);
+  }
+
+  /* ══════════════════════════════════════════
+     VISION QUOTE
+  ══════════════════════════════════════════ */
+  .vision {
+    background: var(--paper-3); padding: 0 60px 120px;
+  }
+  .vision-inner {
+    background:
+      radial-gradient(ellipse 70% 80% at 80% 50%, rgba(22,233,215,.07) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 70% at 10% 30%, rgba(192,115,40,.1) 0%, transparent 55%),
+      linear-gradient(135deg, #1A1660 0%, #0F1147 60%, #0C1840 100%);
+    border-radius: 28px; padding: 84px 88px;
+    position: relative; overflow: hidden;
+    border: 1px solid rgba(22,233,215,.07);
+  }
+  .vision-inner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 180px 180px; opacity: .6;
+    pointer-events: none;
+  }
+  .vision-inner::after {
+    content: '"';
+    position: absolute; bottom: -70px; right: 56px;
+    font-family: var(--font-display); font-size: 300px; font-weight: 700;
+    color: rgba(22,233,215,.04); line-height: 1;
+    pointer-events: none;
+  }
+
+  .vision-text {
+    font-family: var(--font-display); font-size: clamp(26px, 2.8vw, 40px);
+    font-style: italic; font-weight: 500; line-height: 1.5;
+    color: rgba(255,255,255,.92); max-width: 700px;
+    margin-bottom: 48px; position: relative; z-index: 1;
+  }
+  .vision-text em { color: var(--cyan); font-style: normal; }
+
+  .vision-meta { display: flex; align-items: center; gap: 18px; position: relative; z-index: 1; flex-wrap: wrap; }
+  .vision-badge {
+    padding: 7px 18px;
+    background: rgba(22,233,215,.09); border: 1px solid rgba(22,233,215,.18);
+    border-radius: 99px;
+  }
+  .vision-badge-text { font-family: var(--font-ui); font-size: 12px; font-weight: 600; letter-spacing: .09em; color: var(--cyan); }
+  .vision-tagline { font-family: var(--font-display); font-style: italic; font-size: 17px; color: rgba(218,227,237,.4); }
+
+  /* ══════════════════════════════════════════
+     FAQ
+  ══════════════════════════════════════════ */
+  .faq { background: var(--paper); padding: 120px 60px; }
+  .faq-hd { margin-bottom: 60px; }
+
+  .faq-list { max-width: 820px; }
+
+  .faq-item {
+    border-bottom: 1px solid var(--gb-border);
+    transition: opacity .5s var(--ease-out), transform .5s var(--ease-out);
+  }
+  .faq-item:first-child { border-top: 1px solid var(--gb-border); }
+
+  .faq-q {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; padding: 24px 0; background: none; border: none; cursor: none;
+    text-align: left;
+    transition: gap .2s;
+  }
+  .faq-q:hover .faq-q-text { color: var(--amber-deep); }
+  .faq-q-text {
+    font-family: var(--font-display); font-size: 19px; font-weight: 600;
+    color: var(--gb-ink); line-height: 1.3;
+    transition: color .2s;
+  }
+  .faq-q-icon {
+    width: 30px; height: 30px; min-width: 30px; border-radius: 50%;
+    background: var(--amber-light); border: 1px solid rgba(192,115,40,.18);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .28s, transform .35s var(--ease-out), box-shadow .3s;
+  }
+  .faq-q-icon svg { width: 13px; height: 13px; stroke: var(--amber); stroke-width: 2; fill: none; transition: transform .35s var(--ease-out), stroke .28s; }
+  .faq-item:hover .faq-q-icon { box-shadow: var(--shadow-warm); }
+  .faq-item.open .faq-q-icon { background: var(--amber); transform: rotate(45deg); box-shadow: var(--shadow-warm); }
+  .faq-item.open .faq-q-icon svg { stroke: #fff; }
+
+  .faq-body {
+    overflow: hidden; max-height: 0;
+    transition: max-height .45s var(--ease-out);
+  }
+  .faq-item.open .faq-body { max-height: 360px; }
+
+  .faq-body-inner {
+    padding-bottom: 26px;
+    font-family: var(--font-body); font-size: 15.5px; font-weight: 300; line-height: 1.82;
+    color: var(--gb-mid);
+  }
+  .faq-body-inner code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px;
+    background: var(--paper-2); color: var(--amber-deep);
+    padding: 2px 7px; border-radius: 5px;
+  }
+
+  /* ══════════════════════════════════════════
+     CTA BLOCK
+  ══════════════════════════════════════════ */
+  .cta {
+    background: var(--grad-momentum);
+    padding: 120px 60px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta::before {
+    content: ''; position: absolute;
+    top: -50%; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(22,233,215,.1) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .cta::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(22,233,215,.3), transparent);
+  }
+  .cta-eyebrow {
+    font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 24px; position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .cta-eyebrow::before, .cta-eyebrow::after {
+    content: ''; display: block; width: 32px; height: 1px;
+    background: rgba(22,233,215,.4);
+  }
+  .cta-title {
+    font-family: var(--font-display); font-weight: 700; line-height: 1.06;
+    font-size: clamp(42px, 5.2vw, 66px);
+    color: #fff; margin-bottom: 20px; position: relative; z-index: 1;
+  }
+  .cta-title em { color: var(--cyan); font-style: italic; }
+  .cta-sub {
+    font-family: var(--font-body); font-size: 17px; font-weight: 300;
+    color: rgba(218,227,237,.62); margin-bottom: 52px;
+    position: relative; z-index: 1;
+  }
+  .cta-btns {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    position: relative; z-index: 1;
+  }
+
+  /* ══════════════════════════════════════════
+     FOOTER
+  ══════════════════════════════════════════ */
+  footer {
+    background: var(--navy); padding: 56px 60px 40px;
+    border-top: 1px solid rgba(218,227,237,.06);
+  }
+  .footer-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding-bottom: 40px; margin-bottom: 36px;
+    border-bottom: 1px solid rgba(218,227,237,.06);
+  }
+  .footer-brand img { height: 36px; width: auto; margin-bottom: 18px; }
+  .footer-tagline {
+    font-family: var(--font-display); font-style: italic; font-size: 15px;
+    color: rgba(218,227,237,.3);
+  }
+
+  .footer-links-group { display: flex; gap: 72px; }
+  .footer-col-title {
+    font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .13em;
+    color: rgba(218,227,237,.3); margin-bottom: 18px;
+  }
+  .footer-col-links { display: flex; flex-direction: column; gap: 12px; }
+  .footer-link {
+    font-family: var(--font-ui); font-size: 14px;
+    color: rgba(218,227,237,.42); transition: color .15s, transform .15s;
+    display: inline-block;
+  }
+  .footer-link:hover { color: rgba(218,227,237,.82); transform: translateX(3px); }
+  .footer-link.admin { color: rgba(22,233,215,.32); }
+  .footer-link.admin:hover { color: var(--cyan); }
+
+  .footer-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-copy { font-family: var(--font-ui); font-size: 12px; color: rgba(218,227,237,.2); }
+  .footer-built { font-family: var(--font-display); font-style: italic; font-size: 13px; color: rgba(218,227,237,.18); }
+
+  /* ══════════════════════════════════════════
+     ANIMATIONS
+  ══════════════════════════════════════════ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ══════════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════════ */
+  @media (max-width: 1024px) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+    .nav { padding: 0 28px; }
+    .nav-logo img { height: 44px; }
+    .hero { grid-template-columns: 1fr; padding: 84px 28px 0; gap: 48px; }
+    .hero-left { padding: 72px 0 0; }
+    .hero-right { padding-bottom: 72px; }
+    .chip { display: none; }
+    .stats { grid-template-columns: repeat(2,1fr); }
+    .stat { border-bottom: 1px solid rgba(255,255,255,.08); }
+    .stat:nth-child(2) { border-right: none; }
+    .stat:nth-child(3), .stat:nth-child(4) { border-bottom: none; }
+    .how, .benefits, .faq, .cta { padding-left: 28px; padding-right: 28px; }
+    .vision { padding-left: 28px; padding-right: 28px; }
+    .vision-inner { padding: 52px 40px; }
+    .steps { grid-template-columns: repeat(2,1fr); gap: 48px; }
+    .steps::before { display: none; }
+    .benefits-grid { grid-template-columns: repeat(2,1fr); }
+    footer { padding: 44px 28px 32px; }
+    .footer-top { flex-direction: column; gap: 44px; }
+    .footer-links-group { gap: 44px; }
+    .footer-bottom { flex-direction: column; gap: 10px; text-align: center; }
+    .cta-btns { flex-direction: column; align-items: stretch; max-width: 340px; margin: 0 auto; }
+  }
+
+  @media (max-width: 640px) {
+    .steps, .benefits-grid { grid-template-columns: 1fr; }
+    .hero-headline { font-size: clamp(46px, 13vw, 64px); }
+    .nav-right { gap: 8px; }
+    .nav-right .btn { padding: 9px 14px; font-size: 12.5px; }
+    .vision-inner { padding: 44px 28px; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+<!-- ══════════ NAV ══════════ -->
+<header>
+  <nav class="nav" id="nav">
+    <a href="./index.html" class="nav-logo" aria-label="STARTRADER homepage">
+      <img
+        src="./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_Inverted_RGB.png"
+        alt="STARTRADER"
+        height="56"
+      />
+    </a>
+    <div class="nav-right">
+      <a href="./register.html" class="btn btn-cyan">Create account</a>
+      <a href="./login.html" class="btn btn-ghost">Sign in</a>
+      <a href="./admin-login.html" class="btn btn-admin-nav">Admin</a>
+    </div>
+  </nav>
+</header>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero" aria-label="Hero">
+  <div class="hero-bg-amber" aria-hidden="true"></div>
+  <div class="hero-bg-cyan"  aria-hidden="true"></div>
+  <div class="hero-bg-gold"  aria-hidden="true"></div>
+  <div class="hero-grid-overlay" aria-hidden="true"></div>
+  <div class="hero-grain"        aria-hidden="true"></div>
+  <div class="hero-bottom-fade"  aria-hidden="true"></div>
+
+  <!-- Left: copy -->
+  <div class="hero-left">
+    <div class="hero-pill" aria-label="Reading Growth Program">
+      <span class="hero-pill-dot" aria-hidden="true"></span>
+      Reading Growth Program · StarTrader &amp; StarPrime
+    </div>
+
+    <h1 class="hero-headline">
+      <span class="ln ln-1">One Book.</span>
+      <span class="ln ln-2">One Quarter.</span>
+      <span class="ln ln-3">One Step</span>
+      <span class="ln ln-4">Forward.</span>
+    </h1>
+
+    <p class="hero-body">
+      Your company funds one book every quarter — matched to your exact challenges by AI. HR handles purchasing, packaging, and delivery. You just read.
+    </p>
+
+    <div class="hero-ctas">
+      <a href="./register.html" class="btn btn-amber">
+        Get started — it's free
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <path d="M2.5 7.5h10M9 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="hero-cta-note">
+        <strong>$80 budget · Q2 now open</strong>
+        No paperwork. No out-of-pocket cost.
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: UI mockup -->
+  <div class="hero-right" aria-hidden="true">
+    <div class="mockup-wrap">
+      <div class="chip chip-a">
+        <div class="chip-val">$80</div>
+        <div class="chip-lbl">per quarter</div>
+      </div>
+      <div class="chip chip-b">
+        <div class="chip-val">5</div>
+        <div class="chip-lbl">AI picks</div>
+      </div>
+
+      <div class="mockup">
+        <div class="mk-row">
+          <span class="mk-label">This Quarter</span>
+          <span class="mk-chip">Q2 OPEN</span>
+        </div>
+
+        <div class="mk-quota">
+          <div>
+            <div class="mk-q-val">$80</div>
+            <div class="mk-q-sub">remaining budget</div>
+          </div>
+          <div class="mk-q-right">
+            <div class="mk-q-days">52</div>
+            <div class="mk-q-dlabel">days left</div>
+          </div>
+        </div>
+
+        <div class="mk-input">
+          <div class="mk-input-lbl">What's on your plate lately?</div>
+          <div class="mk-input-text">"I want to improve my leadership skills managing a cross-functional sales team…"</div>
+        </div>
+
+        <div class="mk-divider">
+          <div class="mk-divider-line"></div>
+          <div class="mk-divider-txt">5 books matched</div>
+          <div class="mk-divider-line"></div>
+        </div>
+
+        <div class="mk-book">
+          <div class="mk-cover c1">The Manager's Path</div>
+          <div class="mk-book-body">
+            <div class="mk-rank">Best match #1</div>
+            <div class="mk-title">The Manager's Path</div>
+            <div class="mk-author">Camille Fournier</div>
+            <div class="mk-bar-row">
+              <div class="mk-track"><div class="mk-fill" style="width:97%"></div></div>
+              <span class="mk-pct">97%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mk-book">
+          <div class="mk-cover c2">Radical Candor</div>
+          <div class="mk-book-body">
+            <div class="mk-rank">#2</div>
+            <div class="mk-title">Radical Candor</div>
+            <div class="mk-author">Kim Scott</div>
+            <div class="mk-bar-row">
+              <div class="mk-track"><div class="mk-fill" style="width:89%"></div></div>
+              <span class="mk-pct">89%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mk-book">
+          <div class="mk-cover c3">Never Split the Difference</div>
+          <div class="mk-book-body">
+            <div class="mk-rank">#3</div>
+            <div class="mk-title">Never Split the Difference</div>
+            <div class="mk-author">Chris Voss</div>
+            <div class="mk-bar-row">
+              <div class="mk-track"><div class="mk-fill" style="width:81%"></div></div>
+              <span class="mk-pct">81%</span>
+            </div>
+          </div>
+        </div>
+      </div><!-- /mockup -->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ STATS ══════════ -->
+<div class="stats" aria-label="Program numbers">
+  <div class="stat">
+    <div class="stat-num">$<em class="count" data-target="320">0</em></div>
+    <div class="stat-lbl">Annual Book Budget</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num"><em class="count" data-target="5">0</em></div>
+    <div class="stat-lbl">AI Picks Per Request</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num"><em class="count" data-target="4">0</em></div>
+    <div class="stat-lbl">Quarters per Year</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num"><em class="count" data-target="0">0</em></div>
+    <div class="stat-lbl">Out-of-Pocket Cost</div>
+  </div>
+</div>
+
+<!-- ══════════ HOW IT WORKS ══════════ -->
+<section class="how" id="how-it-works" aria-labelledby="how-title">
+  <div class="how-hd reveal">
+    <p class="sec-eyebrow">Simple process</p>
+    <h2 class="sec-title" id="how-title">From curiosity<br>to <em>knowledge</em> in 4 steps.</h2>
+    <p class="sec-sub">Our streamlined process makes it easy to discover, request, and receive books that accelerate your professional growth.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num-wrap"><span class="step-num">01</span></div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h3 class="step-title">Describe your challenge</h3>
+      <p class="step-body">Tell our AI about a work problem you're facing or a skill you want to develop. No format required — just write naturally.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num-wrap"><span class="step-num">02</span></div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <h3 class="step-title">Get AI recommendations</h3>
+      <p class="step-body">Receive 5 personalized books ranked by relevance, each with a clear explanation of why it matches your situation and what problem it solves.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num-wrap"><span class="step-num">03</span></div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      </div>
+      <h3 class="step-title">Select your book</h3>
+      <p class="step-body">Choose the book that resonates most. Confirm your delivery address and reading goal. HR handles approval, purchasing, and shipping.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num-wrap"><span class="step-num">04</span></div>
+      <div class="step-icon">
+        <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <h3 class="step-title">Read, reflect, review</h3>
+      <p class="step-body">Your book arrives in STARTRADER packaging. After reading, share a short review. Your insights help colleagues discover great reads too.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ BENEFITS ══════════ -->
+<section class="benefits" id="benefits" aria-labelledby="benefits-title">
+  <div class="benefits-hd reveal">
+    <p class="sec-eyebrow">Why join</p>
+    <h2 class="sec-title" id="benefits-title">Benefits that fuel<br>your <em>growth</em>.</h2>
+    <p class="sec-sub">The Reading Growth Program removes friction and maximizes your learning potential — quarter after quarter.</p>
+  </div>
+
+  <div class="benefits-grid">
+    <div class="benefit-card reveal">
+      <div class="benefit-ico">
+        <svg viewBox="0 0 24 24"><path d="M12 2a8 8 0 1 0 8 8"/><path d="M16 2v6h6"/><path d="M12 12v4"/><path d="M8 12h8"/></svg>
+      </div>
+      <h3 class="benefit-title">AI-powered discovery</h3>
+      <p class="benefit-body">Get personalized recommendations based on your specific challenges, not generic bestseller lists. Every suggestion is tailored to you.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-ico">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      </div>
+      <h3 class="benefit-title">Zero out-of-pocket cost</h3>
+      <p class="benefit-body">$80 per quarter, fully funded by STARTRADER. Invest in yourself without spending a single dollar from your own pocket.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-ico">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <h3 class="benefit-title">Hassle-free fulfillment</h3>
+      <p class="benefit-body">HR handles all purchasing and shipping. Books arrive in STARTRADER-branded packaging at your desk or home — you choose.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-ico">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <h3 class="benefit-title">Track your growth</h3>
+      <p class="benefit-body">Build your reading history, earn achievement badges, and visualize your professional development journey quarter by quarter.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-ico">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <h3 class="benefit-title">Community wisdom</h3>
+      <p class="benefit-body">Read reviews from colleagues who've faced similar challenges. Browse CEO picks and discover what's working across your organization.</p>
+    </div>
+    <div class="benefit-card reveal">
+      <div class="benefit-ico">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <h3 class="benefit-title">Work-life balance</h3>
+      <p class="benefit-body">Not just business books — explore personal development, creativity, and wellness topics. Your whole self grows, not just your job skills.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ VISION QUOTE ══════════ -->
+<section class="vision" aria-label="Program vision">
+  <div class="vision-inner reveal">
+    <p class="vision-text">
+      This is not simply a book benefit. It is a company culture project — a long-term employee growth system and a lightweight <em>internal knowledge ecosystem</em>.
+    </p>
+    <div class="vision-meta">
+      <div class="vision-badge">
+        <span class="vision-badge-text">STARTRADER Reading Growth Program</span>
+      </div>
+      <span class="vision-tagline">One Book. One Quarter. One Step Forward.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section class="faq" id="faq" aria-labelledby="faq-title">
+  <div class="faq-hd reveal">
+    <p class="sec-eyebrow">Questions?</p>
+    <h2 class="sec-title" id="faq-title">Everything you need<br>to <em>know</em>.</h2>
+  </div>
+
+  <div class="faq-list" role="list">
+
+    <div class="faq-item reveal" role="listitem">
+      <button class="faq-q" aria-expanded="false">
+        <span class="faq-q-text">Who is eligible for the Reading Growth Program?</span>
+        <span class="faq-q-icon" aria-hidden="true">
+          <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+      <div class="faq-body" role="region">
+        <p class="faq-body-inner">All active employees with a <code>@startrader.com</code> or <code>@starprime.com</code> email address are eligible. Email domain is verified at registration — no other domains are accepted. Contractors and external partners are not eligible at this time.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" role="listitem">
+      <button class="faq-q" aria-expanded="false">
+        <span class="faq-q-text">How does the $80 quarterly budget work?</span>
+        <span class="faq-q-icon" aria-hidden="true">
+          <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+      <div class="faq-body" role="region">
+        <p class="faq-body-inner">Each quarter (Q1–Q4) you receive a $80 USD company-funded allowance for one book. Shipping is covered separately — it doesn't count against your budget. Unused quota expires at the end of the quarter and cannot be rolled over. The annual total is $320 per employee.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" role="listitem">
+      <button class="faq-q" aria-expanded="false">
+        <span class="faq-q-text">What types of books can I request?</span>
+        <span class="faq-q-icon" aria-hidden="true">
+          <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+      <div class="faq-body" role="region">
+        <p class="faq-body-inner">Any book from our curated catalogue of ~2,000 titles. The catalogue covers leadership, sales, technology, product, personal development, creativity, wellness, and more. Our AI will recommend the most relevant titles from your description — you're not limited to a genre.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" role="listitem">
+      <button class="faq-q" aria-expanded="false">
+        <span class="faq-q-text">How long does it take to receive my book?</span>
+        <span class="faq-q-icon" aria-hidden="true">
+          <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+      <div class="faq-body" role="region">
+        <p class="faq-body-inner">Once HR approves your order (typically within 1–2 business days), the book is purchased and packaged. Delivery usually takes 3–7 business days depending on your location. You'll receive a tracking notification when your book ships.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" role="listitem">
+      <button class="faq-q" aria-expanded="false">
+        <span class="faq-q-text">What happens if a book exceeds the $80 budget?</span>
+        <span class="faq-q-icon" aria-hidden="true">
+          <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+      <div class="faq-body" role="region">
+        <p class="faq-body-inner">Books priced above $80 are excluded from AI recommendations by default. For special cases (e.g. technical textbooks or reference volumes slightly over budget), HR has override capability and can approve on a case-by-case basis. Contact your HR team to discuss.</p>
+      </div>
+    </div>
+
+    <div class="faq-item reveal" role="listitem">
+      <button class="faq-q" aria-expanded="false">
+        <span class="faq-q-text">Is the review required after reading?</span>
+        <span class="faq-q-icon" aria-hidden="true">
+          <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </button>
+      <div class="faq-body" role="region">
+        <p class="faq-body-inner">No — reviews are strongly encouraged but never required. The program's only ask is a short review when you're done. Your review helps colleagues discover great reads and improves AI recommendations for everyone. Reviews are visible to all company employees in the Community feed.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ CTA ══════════ -->
+<section class="cta" aria-labelledby="cta-title">
+  <p class="cta-eyebrow">Join the program</p>
+  <h2 class="cta-title" id="cta-title">Read. Grow. <em>Succeed.</em></h2>
+  <p class="cta-sub">Invest in your future through continuous learning. One book at a time.</p>
+  <div class="cta-btns">
+    <a href="./register.html" class="btn btn-amber">
+      Get started — it's free
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+        <path d="M2.5 7.5h10M9 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <a href="./login.html" class="btn btn-outline-light">Sign in to existing account</a>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <img
+        src="./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_Inverted_RGB.png"
+        alt="STARTRADER"
+        height="36"
+      />
+      <p class="footer-tagline">Built on Trust. Driven by Growth.</p>
+    </div>
+
+    <nav class="footer-links-group" aria-label="Footer navigation">
+      <div class="footer-col">
+        <p class="footer-col-title">Program</p>
+        <div class="footer-col-links">
+          <a href="#how-it-works" class="footer-link">How it works</a>
+          <a href="#benefits" class="footer-link">Benefits</a>
+          <a href="#faq" class="footer-link">FAQ</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col-title">Account</p>
+        <div class="footer-col-links">
+          <a href="./register.html" class="footer-link">Create account</a>
+          <a href="./login.html" class="footer-link">Sign in</a>
+          <a href="./dashboard.html" class="footer-link">Dashboard</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <p class="footer-col-title">Company</p>
+        <div class="footer-col-links">
+          <a href="#faq" class="footer-link">Privacy policy</a>
+          <a href="./admin-login.html" class="footer-link admin">Admin portal →</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 StarTrader &amp; StarPrime · Internal Use Only · Confidential</p>
+    <p class="footer-built">Reading Growth Program · Version 1.0</p>
+  </div>
+</footer>
+
+<!-- ══════════ SCRIPTS ══════════ -->
+
+<script>
+  // ── Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('a, button, .benefit-card, .step').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+  });
+
+  // ── Nav scroll state
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  // ── Button ripple
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const r = document.createElement('span');
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 1.5;
+      r.className = 'ripple';
+      r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px`;
+      btn.appendChild(r);
+      setTimeout(() => r.remove(), 600);
+    });
+  });
+
+  // ── Stats count-up
+  const countEls = document.querySelectorAll('.count');
+  let counted = false;
+  const statsIO = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !counted) {
+      counted = true;
+      countEls.forEach(el => {
+        const target = +el.dataset.target;
+        if (target === 0) return;
+        const dur = 1200;
+        const step = 16;
+        const inc  = target / (dur / step);
+        let cur = 0;
+        const t = setInterval(() => {
+          cur = Math.min(cur + inc, target);
+          el.textContent = Math.round(cur);
+          if (cur >= target) clearInterval(t);
+        }, step);
+      });
+    }
+  }, { threshold: 0.3 });
+  if (countEls[0]) statsIO.observe(countEls[0].closest('.stats'));
+
+  // ── Scroll reveal (sections with .reveal)
+  const revealIO = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+
+      // Stagger siblings in same grid
+      const parent = el.parentElement;
+      const siblings = [...parent.querySelectorAll('.reveal')];
+      const idx = siblings.indexOf(el);
+      el.style.transitionDelay = `${idx * 0.09}s`;
+
+      el.classList.add('on');
+      revealIO.unobserve(el);
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => revealIO.observe(el));
+
+  // ── FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item   = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+
+      document.querySelectorAll('.faq-item.open').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+</script>
+
+</body>
+</html>

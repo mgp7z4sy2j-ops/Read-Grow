@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id          String   @id
+  title       String
+  author      String
+  price       Float
+  category    String
+  difficulty  String
+  readingTime String   @default("~6 hours") @map("reading_time")
+  tags        String[]
+  keywords    String[]
+  isbn        String?
+  isAvailable Boolean  @default(true) @map("is_available")
+  priceSource String?  @map("price_source")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  orders      Order[]
+
+  @@map("books")
+}
+
+model Order {
+  id                       String   @id @default(cuid())
+  orderNumber              String   @unique @map("order_number")
+  bookId                   String?  @map("book_id")
+  book                     Book?    @relation(fields: [bookId], references: [id])
+  isbn                     String?
+  title                    String
+  author                   String
+  price                    Float
+  employee                 String
+  email                    String
+  department               String
+  company                  String
+  quarter                  String   @default("Q2 2026")
+  aiInput                  String?  @map("ai_input")
+  status                   String   @default("pending")
+  goal                     String?
+  address                  String?
+  expectedCompletion       String?  @map("expected_completion")
+  trackingNumber           String?  @map("tracking_number")
+  priceSource              String?  @map("price_source")
+  pendingPriceVerification Boolean  @default(false) @map("pending_price_verification")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([email])
+  @@map("orders")
+}

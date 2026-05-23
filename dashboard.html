@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — STARTRADER Reading Growth Program</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root {
+  --navy:        #0F1147;
+  --navy-mid:    #161B5E;
+  --navy-light:  #202880;
+  --cyan:        #16E9D7;
+  --cyan-dim:    #5DD8CC;
+  --blue:        #0047BB;
+  --amber:       #C07328;
+  --amber-deep:  #8C4E10;
+  --amber-light: #FDF2E4;
+  --gold:        #E8A83A;
+  --paper:       #FAF7F2;
+  --paper-2:     #F3EDE4;
+  --paper-3:     #EDE4D8;
+  --gb-ink:      #1A130C;
+  --gb-mid:      #574739;
+  --gb-light:    #9A8A78;
+  --gb-faint:    #D0C4B2;
+  --gb-border:   #E4D9CC;
+  --success:     #16A97A;
+  --error:       #D94F4F;
+  --warn:        #E8A83A;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-ui:      'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --ease-out:    cubic-bezier(.16,1,.3,1);
+
+  --sb-w: 260px;
+  --topbar-h: 64px;
+}
+
+/* ══════════════════════════════════════════════
+   RESET
+══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body { font-family: var(--font-ui); background: var(--paper); color: var(--gb-ink); overflow-x: hidden; -webkit-font-smoothing: antialiased; cursor: none; height: 100%; }
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+button { font-family: var(--font-ui); }
+
+/* ══════════════════════════════════════════════
+   CURSOR
+══════════════════════════════════════════════ */
+.cursor {
+  position: fixed; z-index: 9999; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--cyan); pointer-events: none; transform: translate(-50%,-50%);
+  mix-blend-mode: difference;
+  transition: width .18s var(--ease-out), height .18s var(--ease-out);
+}
+.cursor.expand { width: 32px; height: 32px; background: rgba(22,233,215,.18); }
+.cursor-ring {
+  position: fixed; z-index: 9998; width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(22,233,215,.3); pointer-events: none; transform: translate(-50%,-50%);
+}
+
+/* ══════════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════════ */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ══════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════ */
+.sidebar {
+  width: var(--sb-w); flex-shrink: 0;
+  background: var(--navy);
+  display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden;
+  border-right: 1px solid rgba(218,227,237,.06);
+  position: relative; z-index: 10;
+}
+
+/* Logo */
+.sb-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(218,227,237,.06);
+}
+.sb-logo img { height: 36px; width: auto; }
+.sb-logo-sub {
+  font-family: var(--font-ui); font-size: 10.5px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(218,227,237,.28); margin-top: 8px;
+}
+
+/* User */
+.sb-user {
+  padding: 18px 20px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid rgba(218,227,237,.06);
+}
+.sb-avatar {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--amber) 0%, var(--amber-deep) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-ui); font-size: 14px; font-weight: 700; color: #fff;
+}
+.sb-user-info { min-width: 0; }
+.sb-user-name {
+  font-family: var(--font-ui); font-size: 14px; font-weight: 600;
+  color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sb-user-role {
+  font-family: var(--font-ui); font-size: 11.5px; color: rgba(218,227,237,.38);
+  margin-top: 2px;
+}
+
+/* Nav */
+.sb-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+.sb-section-label {
+  font-family: var(--font-ui); font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .13em;
+  color: rgba(218,227,237,.25); padding: 16px 24px 8px;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 20px 10px 22px; margin: 1px 8px;
+  border-radius: 10px; cursor: none;
+  font-family: var(--font-ui); font-size: 13.5px; font-weight: 500;
+  color: rgba(218,227,237,.5);
+  transition: background .18s, color .18s;
+  position: relative;
+}
+.sb-item:hover { background: rgba(255,255,255,.05); color: rgba(218,227,237,.85); }
+.sb-item.active {
+  background: rgba(22,233,215,.09);
+  color: #fff;
+  border-left: 2.5px solid var(--cyan);
+  margin-left: 8px; padding-left: 19.5px;
+}
+.sb-item.active .sb-icon { color: var(--cyan); }
+.sb-icon { width: 18px; height: 18px; flex-shrink: 0; }
+.sb-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+.sb-badge {
+  margin-left: auto; background: var(--amber); color: #fff;
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px;
+}
+.sb-new { margin-left: auto; background: var(--error); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 99px; }
+
+/* Quarter chip */
+.sb-quarter {
+  margin: 0 12px; padding: 14px 16px;
+  background: rgba(22,233,215,.07); border: 1px solid rgba(22,233,215,.14);
+  border-radius: 12px; margin-bottom: 8px;
+}
+.sb-q-label { font-family: var(--font-ui); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(218,227,237,.35); margin-bottom: 6px; }
+.sb-q-row { display: flex; align-items: center; justify-content: space-between; }
+.sb-q-val { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--gold); }
+.sb-q-chip { font-family: var(--font-ui); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; background: var(--cyan); color: var(--navy); padding: 3px 9px; border-radius: 99px; }
+.sb-q-sub { font-family: var(--font-ui); font-size: 11px; color: rgba(218,227,237,.38); margin-top: 4px; }
+
+/* Footer */
+.sb-footer { padding: 12px 12px 16px; border-top: 1px solid rgba(218,227,237,.06); }
+.sb-footer-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px; cursor: none;
+  font-family: var(--font-ui); font-size: 13px; color: rgba(218,227,237,.35);
+  transition: background .18s, color .18s;
+}
+.sb-footer-link:hover { background: rgba(255,255,255,.04); color: rgba(218,227,237,.65); }
+.sb-footer-link svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+
+/* ══════════════════════════════════════════════
+   MAIN AREA
+══════════════════════════════════════════════ */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Topbar */
+.topbar {
+  height: var(--topbar-h); flex-shrink: 0;
+  background: #fff; border-bottom: 1px solid var(--gb-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px;
+  z-index: 5;
+}
+.tb-greeting { }
+.tb-greeting-main {
+  font-family: var(--font-display); font-size: 20px; font-weight: 600;
+  color: var(--gb-ink); line-height: 1;
+}
+.tb-greeting-sub {
+  font-family: var(--font-ui); font-size: 12px; color: var(--gb-light); margin-top: 3px;
+}
+.tb-right { display: flex; align-items: center; gap: 14px; }
+.tb-notif {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--paper); border: 1px solid var(--gb-border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: none; position: relative;
+  transition: background .18s, border-color .18s;
+}
+.tb-notif:hover { background: var(--paper-2); border-color: var(--gb-faint); }
+.tb-notif svg { width: 17px; height: 17px; stroke: var(--gb-mid); fill: none; stroke-width: 1.75; }
+.tb-notif-dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--error); border: 1.5px solid #fff;
+}
+.tb-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--amber) 0%, var(--amber-deep) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-ui); font-size: 13px; font-weight: 700; color: #fff;
+  cursor: none;
+}
+
+/* Content scroll area */
+.content {
+  flex: 1; overflow-y: auto; padding: 36px 40px 80px;
+  scroll-behavior: smooth;
+}
+
+/* ══════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════ */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeUp .4s var(--ease-out); }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══════════════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════════════ */
+.section-hd {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.section-title {
+  font-family: var(--font-display); font-size: 26px; font-weight: 700;
+  color: var(--gb-ink); line-height: 1.1;
+}
+.section-title em { color: var(--amber); font-style: italic; }
+.section-action {
+  font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+  color: var(--amber); cursor: none; transition: color .15s;
+}
+.section-action:hover { color: var(--amber-deep); }
+.eyebrow {
+  font-family: var(--font-ui); font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .15em; color: var(--amber);
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.eyebrow::before { content:''; width:18px; height:1.5px; background:var(--amber); border-radius:99px; }
+.card {
+  background: #fff; border: 1px solid var(--gb-border); border-radius: 18px;
+}
+
+/* Tags */
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 99px;
+  font-family: var(--font-ui); font-size: 11px; font-weight: 500;
+  background: var(--paper-2); color: var(--gb-mid); border: 1px solid var(--gb-border);
+}
+.tag-cyan { background: rgba(22,233,215,.1); color: #0A8A7C; border-color: rgba(22,233,215,.25); }
+.tag-amber { background: var(--amber-light); color: var(--amber-deep); border-color: rgba(192,115,40,.2); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-ui); font-weight: 600; border: none;
+  cursor: none; transition: all .2s var(--ease-out); white-space: nowrap;
+  line-height: 1; position: relative; overflow: hidden;
+}
+.btn:active { transform: scale(.96) !important; }
+.btn::after {
+  content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+  transform:skewX(-15deg); transition:left .5s var(--ease-out); pointer-events:none;
+}
+.btn:hover::after { left:150%; }
+.btn-amber { padding:11px 22px; font-size:14px; border-radius:10px; background:linear-gradient(135deg,#C07328,#8C4E10); color:#fff; box-shadow:0 3px 12px rgba(192,115,40,.22); }
+.btn-amber:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(192,115,40,.34); }
+.btn-cyan { padding:11px 22px; font-size:14px; border-radius:10px; background:var(--cyan); color:var(--navy); font-weight:700; }
+.btn-cyan:hover { background:#3eeedd; transform:translateY(-2px); box-shadow:0 8px 24px rgba(22,233,215,.3); }
+.btn-outline { padding:9px 18px; font-size:13.5px; border-radius:10px; background:transparent; color:var(--gb-mid); border:1.5px solid var(--gb-border); }
+.btn-outline:hover { border-color:var(--amber); color:var(--amber); transform:translateY(-1px); }
+.btn-ghost-sm { padding:7px 14px; font-size:12.5px; border-radius:8px; background:transparent; color:var(--gb-light); border:1px solid var(--gb-border); }
+.btn-ghost-sm:hover { color:var(--gb-mid); border-color:var(--gb-faint); }
+
+.ripple { position:absolute; border-radius:50%; transform:scale(0); background:rgba(255,255,255,.25); animation:rippleOut .55s var(--ease-out) forwards; pointer-events:none; }
+@keyframes rippleOut { to{transform:scale(4);opacity:0} }
+
+/* ══════════════════════════════════════════════
+   TAB 1: THIS QUARTER
+══════════════════════════════════════════════ */
+
+/* Top row: quota card + mini stats */
+.quarter-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 28px; }
+
+.quota-card {
+  background: var(--navy);
+  border-radius: 18px; padding: 26px 28px;
+  position: relative; overflow: hidden;
+  grid-column: 1;
+}
+.quota-card::before {
+  content:''; position:absolute; top:-30%; left:-10%;
+  width:300px; height:300px; border-radius:50%;
+  background:radial-gradient(circle, rgba(232,168,58,.14) 0%, transparent 60%);
+  pointer-events:none;
+}
+.quota-card::after {
+  content:''; position:absolute; bottom:-10%; right:-10%;
+  width:200px; height:200px; border-radius:50%;
+  background:radial-gradient(circle, rgba(22,233,215,.08) 0%, transparent 60%);
+  pointer-events:none;
+}
+.qc-label { font-family:var(--font-ui); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(218,227,237,.35); margin-bottom:16px; }
+.qc-main { display:flex; align-items:center; gap:20px; position:relative; z-index:1; }
+.qc-ring { flex-shrink:0; }
+.qc-ring-svg { width:88px; height:88px; transform:rotate(-90deg); }
+.qc-ring-track { fill:none; stroke:rgba(255,255,255,.08); stroke-width:6; }
+.qc-ring-fill { fill:none; stroke:var(--gold); stroke-width:6; stroke-linecap:round; stroke-dasharray:239; stroke-dashoffset:0; transition:stroke-dashoffset 1.4s var(--ease-out); }
+.qc-ring-text { font-family:var(--font-display); font-size:22px; font-weight:700; fill:var(--gold); }
+.qc-ring-sub { font-family:var(--font-ui); font-size:9px; fill:rgba(218,227,237,.4); }
+.qc-details { }
+.qc-amount { font-family:var(--font-display); font-size:40px; font-weight:700; color:#fff; line-height:1; }
+.qc-amount span { font-size:20px; color:rgba(255,255,255,.6); }
+.qc-desc { font-family:var(--font-ui); font-size:12px; color:rgba(218,227,237,.45); margin-top:4px; }
+.qc-status {
+  display:inline-flex; align-items:center; gap:6px; margin-top:12px;
+  background:rgba(22,233,215,.1); border:1px solid rgba(22,233,215,.18);
+  border-radius:99px; padding:4px 12px;
+  font-family:var(--font-ui); font-size:11px; font-weight:500; color:var(--cyan);
+}
+.qc-status-dot { width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 6px var(--cyan); animation:pulse 2s ease infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+
+/* Stat cards */
+.stat-card {
+  background:#fff; border:1px solid var(--gb-border); border-radius:18px; padding:22px 24px;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.sc-icon { width:40px; height:40px; border-radius:12px; background:var(--amber-light); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+.sc-icon svg { width:20px; height:20px; stroke:var(--amber); fill:none; stroke-width:1.75; }
+.sc-val { font-family:var(--font-display); font-size:32px; font-weight:700; color:var(--gb-ink); line-height:1; margin-bottom:4px; }
+.sc-val em { color:var(--amber); font-style:normal; }
+.sc-label { font-family:var(--font-ui); font-size:12px; color:var(--gb-light); font-weight:500; }
+
+/* AI Finder */
+.ai-card {
+  background: linear-gradient(135deg, #18194A 0%, #0F1147 55%, #0C1640 100%);
+  border-radius: 20px; padding: 32px 36px;
+  border: 1px solid rgba(22,233,215,.08);
+  margin-bottom: 28px; position: relative; overflow: hidden;
+}
+.ai-card::before {
+  content:''; position:absolute; top:-20%; right:-5%;
+  width:360px; height:360px; border-radius:50%;
+  background:radial-gradient(circle, rgba(22,233,215,.07) 0%, transparent 58%);
+  pointer-events:none;
+}
+.ai-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.ai-card-label { font-family:var(--font-ui); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.13em; color:rgba(218,227,237,.36); }
+.ai-powered { display:flex; align-items:center; gap:7px; font-family:var(--font-ui); font-size:11.5px; font-weight:500; color:var(--cyan-dim); }
+.ai-powered svg { width:14px; height:14px; stroke:var(--cyan); fill:none; stroke-width:1.75; }
+.ai-powered-dot { width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 5px var(--cyan); animation:pulse 2s ease infinite; }
+
+.ai-prompt-title { font-family:var(--font-display); font-size:24px; font-weight:600; color:#fff; margin-bottom:16px; }
+.ai-textarea {
+  width:100%; min-height:80px; padding:14px 18px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(218,227,237,.1);
+  border-left:3px solid rgba(22,233,215,.3); border-radius:12px;
+  font-family:var(--font-body); font-size:15px; font-weight:300; line-height:1.75;
+  color:rgba(255,255,255,.82); resize:none; outline:none;
+  transition:border-color .2s, border-left-color .2s, box-shadow .2s;
+}
+.ai-textarea::placeholder { color:rgba(218,227,237,.3); }
+.ai-textarea:focus { border-color:rgba(218,227,237,.18); border-left-color:var(--cyan); box-shadow:0 0 0 3px rgba(22,233,215,.07); }
+
+.ai-footer { display:flex; align-items:center; justify-content:space-between; margin-top:16px; }
+.ai-hint { font-family:var(--font-ui); font-size:12px; color:rgba(218,227,237,.3); }
+.ai-state { display:flex; align-items:center; gap:8px; font-family:var(--font-ui); font-size:12.5px; color:var(--cyan-dim); }
+.ai-state svg { width:14px; height:14px; stroke:var(--cyan); fill:none; stroke-width:2; }
+
+/* Recommendations */
+.recs-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.recs-title { font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--gb-ink); }
+.recs-meta { font-family:var(--font-ui); font-size:12.5px; color:var(--gb-light); }
+
+.rec-loading, .rec-error, .rec-empty {
+  text-align:center; padding:48px 24px; border-radius:18px;
+  background:#fff; border:1.5px dashed var(--gb-border);
+  font-family:var(--font-ui); font-size:14px; color:var(--gb-mid);
+}
+.rec-loading span {
+  display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:var(--amber); margin:0 3px;
+  animation:recPulse 1s ease infinite;
+}
+.rec-loading span:nth-child(2) { animation-delay:.15s; }
+.rec-loading span:nth-child(3) { animation-delay:.3s; }
+@keyframes recPulse { 0%,100%{opacity:.3;transform:scale(.85)} 50%{opacity:1;transform:scale(1)} }
+.rec-error p { margin-bottom:8px; line-height:1.55; }
+.rec-error strong { color:var(--gb-ink); }
+
+.rec-card {
+  background:#fff; border:1.5px solid var(--gb-border); border-radius:18px;
+  padding:22px 24px; margin-bottom:14px; display:flex; gap:20px;
+  transition:border-color .25s, box-shadow .3s var(--ease-out), transform .3s var(--ease-out);
+  cursor:none; position:relative; overflow:hidden;
+}
+.rec-card::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--gb-border); transition:background .3s;
+}
+.rec-card:hover { border-color:rgba(192,115,40,.3); transform:translateY(-3px); box-shadow:0 12px 36px rgba(192,115,40,.1); }
+.rec-card:hover::before { background:var(--amber); }
+.rec-card.selected { border-color:var(--amber); box-shadow:0 0 0 3px rgba(192,115,40,.12); }
+.rec-card.selected::before { background:var(--amber); }
+
+/* Book cover */
+.rec-cover {
+  width:76px; min-width:76px; height:108px; border-radius:8px;
+  display:flex; align-items:flex-end; padding:8px;
+  font-family:var(--font-display); font-style:italic; font-size:9px;
+  color:rgba(255,255,255,.85); line-height:1.35; position:relative;
+  overflow:hidden; flex-shrink:0;
+}
+.rec-cover::after { content:''; position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.35) 0%, transparent 55%); }
+.rec-cover span { position:relative; z-index:1; }
+.cov-1 { background:linear-gradient(155deg,#1b3c5e,#2e6ca8); }
+.cov-2 { background:linear-gradient(155deg,#3a2060,#6e45b8); }
+.cov-3 { background:linear-gradient(155deg,#1e4020,#3a7a40); }
+.cov-4 { background:linear-gradient(155deg,#5c2020,#a83030); }
+.cov-5 { background:linear-gradient(155deg,#1a3848,#2e7490); }
+
+.rec-rank {
+  position:absolute; top:8px; left:8px; z-index:2;
+  font-family:var(--font-ui); font-size:9px; font-weight:700;
+  background:rgba(0,0,0,.5); color:#fff;
+  padding:2px 7px; border-radius:99px; letter-spacing:.06em;
+}
+
+/* Rec body */
+.rec-body { flex:1; min-width:0; }
+.rec-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.rec-title { font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--gb-ink); line-height:1.15; }
+.rec-author { font-family:var(--font-ui); font-size:12.5px; color:var(--gb-light); margin-top:2px; }
+.rec-score {
+  flex-shrink:0; display:flex; align-items:center; gap:8px;
+}
+.rec-pct { font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--amber); line-height:1; }
+.rec-pct-sub { font-family:var(--font-ui); font-size:10px; color:var(--gb-light); line-height:1.3; }
+
+.rec-why { font-family:var(--font-body); font-size:13.5px; font-weight:300; line-height:1.72; color:var(--gb-mid); margin-bottom:12px; }
+.rec-problem { font-family:var(--font-ui); font-size:12px; color:var(--amber-deep); background:var(--amber-light); border-radius:8px; padding:6px 12px; margin-bottom:12px; }
+.rec-problem strong { font-weight:600; }
+
+.rec-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+.rec-meta-item { display:flex; align-items:center; gap:5px; font-family:var(--font-ui); font-size:12px; color:var(--gb-light); }
+.rec-meta-item svg { width:13px; height:13px; stroke:var(--gb-faint); fill:none; stroke-width:2; }
+.rec-meta-sep { color:var(--gb-border); }
+
+.rec-actions { display:flex; align-items:center; gap:10px; }
+.rec-price { font-family:var(--font-ui); font-size:13px; font-weight:600; color:var(--gb-mid); }
+.rec-budget-ok { font-family:var(--font-ui); font-size:11px; color:var(--success); display:flex; align-items:center; gap:4px; }
+.rec-budget-ok svg { width:12px; height:12px; stroke:var(--success); fill:none; stroke-width:2.5; }
+.rec-budget-bad { font-family:var(--font-ui); font-size:11px; color:var(--danger); display:flex; align-items:center; gap:4px; }
+.rec-budget-bad svg { width:12px; height:12px; stroke:var(--danger); fill:none; stroke-width:2.5; }
+.btn-select { padding:9px 20px; font-size:13.5px; border-radius:9px; }
+.btn-selected { padding:9px 20px; font-size:13.5px; border-radius:9px; background:var(--success); color:#fff; border:none; display:flex; align-items:center; gap:6px; }
+.btn-selected svg { width:14px; height:14px; stroke:#fff; fill:none; stroke-width:2.5; }
+
+/* Sticky bar */
+.sticky-bar {
+  position:fixed; bottom:0; left:var(--sb-w); right:0; z-index:50;
+  background:#fff; border-top:1px solid var(--gb-border);
+  padding:16px 40px; display:flex; align-items:center; justify-content:space-between;
+  box-shadow:0 -8px 32px rgba(26,19,12,.08);
+  transform:translateY(100%); transition:transform .4s var(--ease-out);
+}
+.sticky-bar.show { transform:translateY(0); }
+.sb-sel-label { font-family:var(--font-ui); font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--gb-light); margin-bottom:4px; }
+.sb-sel-book { font-family:var(--font-display); font-size:19px; font-weight:700; color:var(--gb-ink); }
+.sb-sel-author { font-family:var(--font-ui); font-size:13px; color:var(--gb-light); margin-top:2px; }
+.sb-actions { display:flex; align-items:center; gap:12px; }
+
+/* ══════════════════════════════════════════════
+   TAB 2: MY SHELF
+══════════════════════════════════════════════ */
+.shelf-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+
+.shelf-card {
+  background:#fff; border:1.5px solid var(--gb-border); border-radius:18px;
+  overflow:hidden;
+  transition:border-color .25s, transform .3s var(--ease-out), box-shadow .3s var(--ease-out);
+}
+.shelf-card:hover { border-color:rgba(192,115,40,.3); transform:translateY(-4px); box-shadow:0 12px 32px rgba(192,115,40,.1); }
+.shelf-card.no-review { border-style:dashed; }
+
+.sc-cover {
+  height:140px; display:flex; align-items:flex-end; padding:16px;
+  position:relative;
+}
+.sc-cover::after { content:''; position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.5) 0%, transparent 60%); }
+.sc-quarter-badge {
+  position:absolute; top:12px; right:12px; z-index:1;
+  font-family:var(--font-ui); font-size:10px; font-weight:700;
+  background:rgba(0,0,0,.55); color:#fff; padding:3px 10px; border-radius:99px; letter-spacing:.06em;
+  backdrop-filter:blur(6px);
+}
+.sc-book-title { position:relative; z-index:1; font-family:var(--font-display); font-size:14px; font-style:italic; color:#fff; line-height:1.3; }
+
+.sc-body { padding:18px 20px; }
+.sc-title { font-family:var(--font-display); font-size:18px; font-weight:700; color:var(--gb-ink); margin-bottom:3px; }
+.sc-author { font-family:var(--font-ui); font-size:12px; color:var(--gb-light); margin-bottom:12px; }
+
+.sc-stars { display:flex; gap:3px; margin-bottom:10px; }
+.star { width:14px; height:14px; }
+.star.filled svg { stroke:var(--gold); fill:var(--gold); }
+.star.empty svg { stroke:var(--gb-faint); fill:none; }
+.star svg { width:14px; height:14px; stroke-width:1.5; }
+
+.sc-review { font-family:var(--font-body); font-size:13px; font-style:italic; line-height:1.65; color:var(--gb-mid); border-left:2.5px solid var(--gb-border); padding-left:12px; margin-bottom:14px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.sc-review-prompt {
+  font-family:var(--font-ui); font-size:13px; color:var(--amber); font-weight:500;
+  display:flex; align-items:center; gap:6px;
+}
+.sc-review-prompt svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; }
+
+/* ══════════════════════════════════════════════
+   TAB 3: COMMUNITY
+══════════════════════════════════════════════ */
+.community-tabs { display:flex; gap:6px; margin-bottom:24px; }
+.ctab {
+  padding:8px 18px; border-radius:99px; font-family:var(--font-ui); font-size:13.5px; font-weight:500;
+  background:transparent; color:var(--gb-light); border:1.5px solid var(--gb-border); cursor:none;
+  transition:all .18s;
+}
+.ctab.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+.ctab:hover:not(.active) { border-color:var(--gb-faint); color:var(--gb-mid); }
+
+.review-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-bottom:36px; }
+
+.review-card {
+  background:#fff; border:1px solid var(--gb-border); border-radius:16px; padding:22px;
+  transition:transform .25s var(--ease-out), box-shadow .25s;
+}
+.review-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(26,19,12,.07); }
+.rv-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+.rv-avatar {
+  width:38px; height:38px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-ui); font-size:13px; font-weight:700; color:#fff;
+}
+.rv-info { }
+.rv-name { font-family:var(--font-ui); font-size:13.5px; font-weight:600; color:var(--gb-ink); }
+.rv-meta { font-family:var(--font-ui); font-size:11.5px; color:var(--gb-light); margin-top:2px; }
+.rv-book { font-family:var(--font-display); font-size:17px; font-weight:700; color:var(--gb-ink); margin-bottom:6px; }
+.rv-book-author { font-family:var(--font-ui); font-size:12px; color:var(--gb-light); margin-bottom:12px; }
+.rv-quote { font-family:var(--font-body); font-size:13.5px; font-style:italic; color:var(--gb-mid); line-height:1.7; border-left:2px solid var(--gb-border); padding-left:12px; margin-bottom:14px; }
+.rv-footer { display:flex; align-items:center; justify-content:space-between; }
+.rv-stars { display:flex; gap:2px; }
+.rv-add { font-family:var(--font-ui); font-size:12px; color:var(--amber); font-weight:500; cursor:none; transition:color .15s; }
+.rv-add:hover { color:var(--amber-deep); }
+
+.ceo-card {
+  background:linear-gradient(135deg, #1A1660 0%, #0F1147 70%);
+  border-radius:18px; padding:28px 32px; display:flex; gap:28px;
+  align-items:center; margin-bottom:28px;
+  border:1px solid rgba(22,233,215,.08);
+}
+.ceo-badge {
+  font-family:var(--font-ui); font-size:9.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  background:var(--gold); color:var(--navy); padding:4px 12px; border-radius:99px; margin-bottom:12px; display:inline-block;
+}
+.ceo-book { font-family:var(--font-display); font-size:26px; font-weight:700; color:#fff; margin-bottom:4px; }
+.ceo-author { font-family:var(--font-ui); font-size:13px; color:rgba(218,227,237,.55); margin-bottom:12px; }
+.ceo-note { font-family:var(--font-body); font-size:14px; font-style:italic; color:rgba(218,227,237,.7); line-height:1.7; max-width:420px; }
+.ceo-cover {
+  width:90px; min-width:90px; height:128px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:flex-end; padding:10px;
+  font-family:var(--font-display); font-style:italic; font-size:9px; color:rgba(255,255,255,.85); line-height:1.35;
+  background:linear-gradient(155deg,#4a2060,#8a3090); position:relative; overflow:hidden;
+}
+.ceo-cover::after { content:''; position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.4) 0%, transparent 60%); }
+.ceo-cover span { position:relative; z-index:1; }
+
+/* ══════════════════════════════════════════════
+   TAB 4: ACHIEVEMENTS
+══════════════════════════════════════════════ */
+.achievements-top { display:grid; grid-template-columns:2fr 1fr; gap:24px; margin-bottom:32px; }
+
+.badge-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.badge-card {
+  background:#fff; border:1.5px solid var(--gb-border); border-radius:16px; padding:20px 16px;
+  text-align:center; position:relative;
+  transition:transform .25s var(--ease-out), border-color .25s, box-shadow .25s;
+}
+.badge-card.earned { border-color:rgba(232,168,58,.35); }
+.badge-card.earned:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(232,168,58,.14); }
+.badge-card.locked { opacity:.55; filter:grayscale(.4); }
+.badge-ico {
+  width:56px; height:56px; border-radius:50%; margin:0 auto 12px;
+  display:flex; align-items:center; justify-content:center;
+}
+.badge-ico.gold { background:linear-gradient(135deg, #E8A83A, #C07328); box-shadow:0 4px 16px rgba(232,168,58,.3); }
+.badge-ico.cyan { background:linear-gradient(135deg, #16E9D7, #0DB8A9); box-shadow:0 4px 16px rgba(22,233,215,.25); }
+.badge-ico.navy { background:linear-gradient(135deg, #2A3290, #0F1147); }
+.badge-ico.gray { background:var(--paper-3); }
+.badge-ico svg { width:26px; height:26px; stroke:#fff; fill:none; stroke-width:1.75; }
+.badge-ico.gray svg { stroke:var(--gb-light); }
+.badge-name { font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--gb-ink); margin-bottom:5px; }
+.badge-desc { font-family:var(--font-ui); font-size:11.5px; color:var(--gb-light); line-height:1.55; }
+.badge-earned-check {
+  position:absolute; top:12px; right:12px;
+  width:20px; height:20px; border-radius:50%; background:var(--success);
+  display:flex; align-items:center; justify-content:center;
+}
+.badge-earned-check svg { width:11px; height:11px; stroke:#fff; fill:none; stroke-width:2.5; }
+.badge-lock {
+  position:absolute; top:12px; right:12px;
+  width:20px; height:20px; border-radius:50%; background:var(--paper-3);
+  display:flex; align-items:center; justify-content:center;
+}
+.badge-lock svg { width:11px; height:11px; stroke:var(--gb-faint); fill:none; stroke-width:2; }
+
+.streak-card {
+  background:var(--navy); border-radius:18px; padding:28px;
+  display:flex; flex-direction:column; gap:20px;
+}
+.streak-label { font-family:var(--font-ui); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(218,227,237,.35); }
+.streak-val { font-family:var(--font-display); font-size:56px; font-weight:700; color:var(--gold); line-height:1; }
+.streak-sub { font-family:var(--font-ui); font-size:13px; color:rgba(218,227,237,.45); }
+.streak-quarters { display:flex; gap:8px; margin-top:8px; }
+.sq {
+  flex:1; height:6px; border-radius:99px; background:rgba(255,255,255,.08);
+  position:relative; overflow:hidden;
+}
+.sq.done { background:var(--gold); }
+.sq.current { background:var(--cyan); }
+
+.leaderboard { background:#fff; border:1px solid var(--gb-border); border-radius:18px; overflow:hidden; }
+.lb-header { padding:18px 22px; border-bottom:1px solid var(--gb-border); font-family:var(--font-display); font-size:19px; font-weight:700; color:var(--gb-ink); }
+.lb-row {
+  display:flex; align-items:center; gap:14px; padding:14px 22px;
+  border-bottom:1px solid rgba(228,217,204,.5); transition:background .15s;
+}
+.lb-row:last-child { border-bottom:none; }
+.lb-row:hover { background:var(--paper); }
+.lb-row.me { background:var(--amber-light); }
+.lb-pos { font-family:var(--font-ui); font-size:12px; font-weight:700; color:var(--gb-light); width:20px; }
+.lb-pos.top { color:var(--gold); }
+.lb-av { width:32px; height:32px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-ui); font-size:11px; font-weight:700; color:#fff; }
+.lb-name { flex:1; font-family:var(--font-ui); font-size:13.5px; font-weight:500; color:var(--gb-ink); }
+.lb-name-sub { font-family:var(--font-ui); font-size:11px; color:var(--gb-light); }
+.lb-books { font-family:var(--font-display); font-size:18px; font-weight:700; color:var(--amber); }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  :root { --sb-w: 220px; }
+  .quarter-row { grid-template-columns:1fr 1fr; }
+  .quota-card { grid-column:1/-1; }
+  .shelf-grid { grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width: 860px) {
+  body { cursor:auto; }
+  .cursor, .cursor-ring { display:none; }
+  .app { flex-direction:column; }
+  .sidebar { width:100%; height:auto; flex-direction:row; flex-wrap:nowrap; overflow-x:auto; padding:12px 16px; }
+  .sb-logo, .sb-user, .sb-quarter, .sb-footer { display:none; }
+  .sb-nav { display:flex; flex-direction:row; padding:0; }
+  .sb-section-label { display:none; }
+  .sb-item { padding:8px 14px; margin:0 2px; border-radius:10px; white-space:nowrap; }
+  .sb-item.active { border-left:none; border-bottom:2px solid var(--cyan); border-radius:0; padding-left:14px; }
+  .main { }
+  .topbar { padding:0 20px; }
+  .content { padding:20px 20px 100px; }
+  .quarter-row { grid-template-columns:1fr; }
+  .review-grid { grid-template-columns:1fr; }
+  .achievements-top { grid-template-columns:1fr; }
+  .badge-grid { grid-template-columns:repeat(2,1fr); }
+  .shelf-grid { grid-template-columns:1fr; }
+  .sticky-bar { left:0; padding:14px 20px; }
+  .ceo-card { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="app">
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <img src="./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_Inverted_RGB.png" alt="STARTRADER" height="36">
+    <div class="sb-logo-sub">Reading Growth Program</div>
+  </div>
+
+  <div class="sb-user">
+    <div class="sb-avatar">KW</div>
+    <div class="sb-user-info">
+      <div class="sb-user-name">Kevin Wang</div>
+      <div class="sb-user-role">Sales · StarTrader</div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section-label">Menu</div>
+    <a class="sb-item active" data-tab="quarter" href="#">
+      <span class="sb-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+      This Quarter
+      <span class="sb-badge">Q2</span>
+    </a>
+    <a class="sb-item" data-tab="shelf" href="#">
+      <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+      My Shelf
+    </a>
+    <a class="sb-item" data-tab="community" href="#">
+      <span class="sb-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      Community
+      <span class="sb-new">3</span>
+    </a>
+    <a class="sb-item" data-tab="achievements" href="#">
+      <span class="sb-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+      Achievements
+    </a>
+  </nav>
+
+  <div style="flex:1"></div>
+
+  <div style="padding:0 12px 12px">
+    <div class="sb-quarter">
+      <div class="sb-q-label">Current Quarter</div>
+      <div class="sb-q-row">
+        <div class="sb-q-val">$80</div>
+        <div class="sb-q-chip">OPEN</div>
+      </div>
+      <div class="sb-q-sub">52 days left in Q2 2026</div>
+    </div>
+  </div>
+
+  <div class="sb-footer">
+    <a href="./index.html" class="sb-footer-link">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Main site
+    </a>
+    <a href="./login.html" class="sb-footer-link" id="signOutLink">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </a>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="tb-greeting">
+      <div class="tb-greeting-main">Good morning, Kevin.</div>
+      <div class="tb-greeting-sub">Q2 2026 is open — your $80 book budget is ready to use.</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif" id="notifBtn">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="tb-notif-dot"></div>
+      </div>
+      <div class="tb-avatar">KW</div>
+    </div>
+  </header>
+
+  <!-- Scrollable content -->
+  <div class="content">
+
+    <!-- ══ TAB: THIS QUARTER ══ -->
+    <div class="tab-panel active" id="tab-quarter">
+
+      <!-- Quarter row -->
+      <div class="quarter-row" style="margin-bottom:28px">
+        <div class="quota-card">
+          <div class="qc-label">Q2 2026 · Book Budget</div>
+          <div class="qc-main">
+            <div class="qc-ring">
+              <svg class="qc-ring-svg" viewBox="0 0 88 88">
+                <circle class="qc-ring-track" cx="44" cy="44" r="38"/>
+                <circle class="qc-ring-fill" id="ringFill" cx="44" cy="44" r="38"/>
+                <text class="qc-ring-text" x="44" y="49" text-anchor="middle">$80</text>
+              </svg>
+            </div>
+            <div class="qc-details">
+              <div class="qc-amount"><span>USD </span>80.00</div>
+              <div class="qc-desc">Full quarterly budget available</div>
+              <div class="qc-status">
+                <span class="qc-status-dot"></span>
+                No book requested yet
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="sc-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div>
+            <div class="sc-val"><em>52</em></div>
+            <div class="sc-label">Days left in Q2</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="sc-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+          <div>
+            <div class="sc-val"><em>3</em></div>
+            <div class="sc-label">Books read total</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Finder -->
+      <div class="ai-card" style="margin-bottom:28px">
+        <div class="ai-card-header">
+          <span class="ai-card-label">AI Book Finder</span>
+          <div class="ai-powered">
+            <span class="ai-powered-dot"></span>
+            Powered by Claude
+          </div>
+        </div>
+        <div class="ai-prompt-title">What's on your plate lately?</div>
+        <textarea class="ai-textarea" id="aiTextarea" rows="3" placeholder="Describe a work challenge, a skill you want to build, or a goal you're working toward…">I want to improve my leadership and communication skills when managing a cross-functional sales team across different time zones.</textarea>
+        <div class="ai-footer">
+          <span class="ai-hint">Be specific — the more context you give, the better your matches.</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="ai-state" id="aiState">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Ready to match
+            </div>
+            <button class="btn btn-cyan" id="aiSubmitBtn" style="padding:10px 20px;font-size:13.5px;border-radius:10px">
+              Recommend five books for me
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="recs-header">
+        <div class="recs-title">Your <em style="color:var(--amber);font-style:italic">5 recommendations</em></div>
+        <div class="recs-meta" id="recsMeta">Describe your challenge above, then get 5 personalized picks</div>
+      </div>
+
+      <div id="recsList">
+        <div class="rec-loading" id="recsPlaceholder"><span></span><span></span><span></span> Loading recommendations…</div>
+      </div>
+
+    </div><!-- /tab-quarter -->
+
+    <!-- ══ TAB: MY SHELF ══ -->
+    <div class="tab-panel" id="tab-shelf">
+      <div class="section-hd" style="margin-bottom:24px">
+        <div>
+          <div class="eyebrow">Reading history</div>
+          <div class="section-title">My <em>Shelf</em></div>
+        </div>
+      </div>
+
+      <div class="shelf-grid">
+
+        <div class="shelf-card">
+          <div class="sc-cover" style="background:linear-gradient(155deg,#28401a,#4d8030)">
+            <div class="sc-quarter-badge">Q1 2026</div>
+            <div class="sc-book-title">Atomic Habits</div>
+          </div>
+          <div class="sc-body">
+            <div class="sc-title">Atomic Habits</div>
+            <div class="sc-author">James Clear</div>
+            <div class="sc-stars">
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            </div>
+            <div class="sc-review">"The 1% improvement framework completely changed how I approach building habits within my sales team's routines. The chapter on environment design was immediately actionable."</div>
+            <div style="display:flex;gap:8px">
+              <span class="tag tag-cyan" style="font-size:11px">Reviewed ✓</span>
+              <span class="tag" style="font-size:11px">Delivered</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="shelf-card">
+          <div class="sc-cover" style="background:linear-gradient(155deg,#1b3c5e,#2e6ca8)">
+            <div class="sc-quarter-badge">Q4 2025</div>
+            <div class="sc-book-title">The Lean Startup</div>
+          </div>
+          <div class="sc-body">
+            <div class="sc-title">The Lean Startup</div>
+            <div class="sc-author">Eric Ries</div>
+            <div class="sc-stars">
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star empty"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            </div>
+            <div class="sc-review">"Valuable perspective on validated learning. Helped me understand why some of our sales experiments were failing — we were optimizing metrics that didn't matter."</div>
+            <div style="display:flex;gap:8px">
+              <span class="tag tag-cyan" style="font-size:11px">Reviewed ✓</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="shelf-card no-review">
+          <div class="sc-cover" style="background:linear-gradient(155deg,#3e1c2e,#7d3050)">
+            <div class="sc-quarter-badge">Q3 2025</div>
+            <div class="sc-book-title">Good to Great</div>
+          </div>
+          <div class="sc-body">
+            <div class="sc-title">Good to Great</div>
+            <div class="sc-author">Jim Collins</div>
+            <div class="sc-stars">
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star empty"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            </div>
+            <div class="sc-review-prompt">
+              <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Write a review — share your insights
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /tab-shelf -->
+
+    <!-- ══ TAB: COMMUNITY ══ -->
+    <div class="tab-panel" id="tab-community">
+      <div class="section-hd" style="margin-bottom:20px">
+        <div>
+          <div class="eyebrow">Reading wall</div>
+          <div class="section-title">Community <em>Picks</em></div>
+        </div>
+      </div>
+
+      <div class="community-tabs">
+        <button class="ctab active">Reading Wall</button>
+        <button class="ctab">CEO Picks</button>
+        <button class="ctab">Top Readers</button>
+      </div>
+
+      <!-- CEO Pick -->
+      <div class="ceo-card" style="margin-bottom:24px">
+        <div>
+          <div class="ceo-badge">CEO PICK · Q2 2026</div>
+          <div class="ceo-book">Thinking, Fast and Slow</div>
+          <div class="ceo-author">Daniel Kahneman</div>
+          <div class="ceo-note">"This book fundamentally changed how I evaluate decisions under pressure. I recommend it to everyone on the leadership team — especially those in sales and product. Understanding System 1 vs System 2 thinking will make you a sharper thinker in any negotiation."</div>
+        </div>
+        <div>
+          <div class="ceo-cover"><span>Thinking, Fast and Slow</span></div>
+        </div>
+      </div>
+
+      <!-- Review grid -->
+      <div class="review-grid">
+        <div class="review-card">
+          <div class="rv-header">
+            <div class="rv-avatar" style="background:linear-gradient(135deg,#2A3290,#0047BB)">SL</div>
+            <div class="rv-info">
+              <div class="rv-name">Sarah Lin</div>
+              <div class="rv-meta">Product · Q1 2026</div>
+            </div>
+          </div>
+          <div class="rv-book">Atomic Habits</div>
+          <div class="rv-book-author">James Clear</div>
+          <div class="rv-quote">"The 2-minute rule alone was worth the whole book. I've since restructured our entire team's onboarding checklist around habit stacking principles."</div>
+          <div class="rv-footer">
+            <div class="rv-stars">
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            </div>
+            <span class="rv-add">+ Add to candidates</span>
+          </div>
+        </div>
+
+        <div class="review-card">
+          <div class="rv-header">
+            <div class="rv-avatar" style="background:linear-gradient(135deg,#1e4020,#3a7a40)">MC</div>
+            <div class="rv-info">
+              <div class="rv-name">Marcus Chen</div>
+              <div class="rv-meta">Engineering · Q1 2026</div>
+            </div>
+          </div>
+          <div class="rv-book">The Phoenix Project</div>
+          <div class="rv-book-author">Gene Kim, Kevin Behr</div>
+          <div class="rv-quote">"If you work in tech, this book will feel uncomfortably familiar. The Three Ways framework gave our team a shared language for discussing bottlenecks that we've used every sprint since."</div>
+          <div class="rv-footer">
+            <div class="rv-stars">
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star empty" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            </div>
+            <span class="rv-add">+ Add to candidates</span>
+          </div>
+        </div>
+
+        <div class="review-card">
+          <div class="rv-header">
+            <div class="rv-avatar" style="background:linear-gradient(135deg,#5c2020,#a83030)">JP</div>
+            <div class="rv-info">
+              <div class="rv-name">Jamie Park</div>
+              <div class="rv-meta">Marketing · Q4 2025</div>
+            </div>
+          </div>
+          <div class="rv-book">Influence</div>
+          <div class="rv-book-author">Robert Cialdini</div>
+          <div class="rv-quote">"A must-read for anyone in marketing. The six principles of persuasion are everywhere once you know them — in every campaign brief, every pitch deck, every email subject line we write."</div>
+          <div class="rv-footer">
+            <div class="rv-stars">
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            </div>
+            <span class="rv-add">+ Add to candidates</span>
+          </div>
+        </div>
+
+        <div class="review-card">
+          <div class="rv-header">
+            <div class="rv-avatar" style="background:linear-gradient(135deg,#1a3848,#2e7490)">AK</div>
+            <div class="rv-info">
+              <div class="rv-name">Aisha Karim</div>
+              <div class="rv-meta">Finance · Q4 2025</div>
+            </div>
+          </div>
+          <div class="rv-book">The Psychology of Money</div>
+          <div class="rv-book-author">Morgan Housel</div>
+          <div class="rv-quote">"Short chapters, each a standalone insight. Changed how I think about risk tolerance and why smart people make financially irrational decisions. Recommended to my whole team."</div>
+          <div class="rv-footer">
+            <div class="rv-stars">
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+              <span class="star filled" style="margin:0 1px"><svg viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            </div>
+            <span class="rv-add">+ Add to candidates</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-community -->
+
+    <!-- ══ TAB: ACHIEVEMENTS ══ -->
+    <div class="tab-panel" id="tab-achievements">
+      <div class="section-hd" style="margin-bottom:24px">
+        <div>
+          <div class="eyebrow">Your progress</div>
+          <div class="section-title">Achievements &amp; <em>Badges</em></div>
+        </div>
+      </div>
+
+      <div class="achievements-top">
+        <div>
+          <div class="badge-grid">
+            <div class="badge-card earned">
+              <div class="badge-earned-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>
+              <div class="badge-ico gold"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+              <div class="badge-name">First Book</div>
+              <div class="badge-desc">Completed your first quarterly book</div>
+            </div>
+            <div class="badge-card earned">
+              <div class="badge-earned-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>
+              <div class="badge-ico cyan"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div class="badge-name">Knowledge Sharer</div>
+              <div class="badge-desc">Posted a quality review (100+ words)</div>
+            </div>
+            <div class="badge-card earned">
+              <div class="badge-earned-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>
+              <div class="badge-ico navy"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+              <div class="badge-name">Quarterly Learner</div>
+              <div class="badge-desc">Consistent reading for 3 quarters</div>
+            </div>
+            <div class="badge-card locked">
+              <div class="badge-lock"><svg viewBox="0 0 12 12"><rect x="2" y="5" width="8" height="6" rx="1"/><path d="M4 5V3.5a2 2 0 0 1 4 0V5"/></svg></div>
+              <div class="badge-ico gray"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+              <div class="badge-name">Growth Champion</div>
+              <div class="badge-desc">Top active learner in department</div>
+            </div>
+            <div class="badge-card locked">
+              <div class="badge-lock"><svg viewBox="0 0 12 12"><rect x="2" y="5" width="8" height="6" rx="1"/><path d="M4 5V3.5a2 2 0 0 1 4 0V5"/></svg></div>
+              <div class="badge-ico gray"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+              <div class="badge-name">AI Explorer</div>
+              <div class="badge-desc">Used AI recommendations 3+ times</div>
+            </div>
+            <div class="badge-card locked">
+              <div class="badge-lock"><svg viewBox="0 0 12 12"><rect x="2" y="5" width="8" height="6" rx="1"/><path d="M4 5V3.5a2 2 0 0 1 4 0V5"/></svg></div>
+              <div class="badge-ico gray"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+              <div class="badge-name">Marathon Reader</div>
+              <div class="badge-desc">Read 4 books in a single year</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <div class="streak-card">
+            <div class="streak-label">Reading streak</div>
+            <div class="streak-val">3</div>
+            <div class="streak-sub">Consecutive quarters</div>
+            <div class="streak-quarters">
+              <div class="sq done" title="Q3 2025"></div>
+              <div class="sq done" title="Q4 2025"></div>
+              <div class="sq done" title="Q1 2026"></div>
+              <div class="sq current" title="Q2 2026 — in progress"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="leaderboard">
+        <div class="lb-header">Sales · Department Leaderboard</div>
+        <div class="lb-row">
+          <div class="lb-pos top">1</div>
+          <div class="lb-av" style="background:linear-gradient(135deg,#C07328,#8C4E10)">RN</div>
+          <div><div class="lb-name">Rachel Ng</div><div class="lb-name-sub">Sales · 4 books</div></div>
+          <div class="lb-books">4</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-pos top">2</div>
+          <div class="lb-av" style="background:linear-gradient(135deg,#0047BB,#2A3290)">DM</div>
+          <div><div class="lb-name">Daniel Moore</div><div class="lb-name-sub">Sales · 4 books</div></div>
+          <div class="lb-books">4</div>
+        </div>
+        <div class="lb-row me">
+          <div class="lb-pos" style="color:var(--amber);font-weight:700">3</div>
+          <div class="lb-av" style="background:linear-gradient(135deg,#C07328,#8C4E10)">KW</div>
+          <div><div class="lb-name">Kevin Wang <span style="font-size:11px;color:var(--amber)">(you)</span></div><div class="lb-name-sub">Sales · 3 books</div></div>
+          <div class="lb-books" style="color:var(--amber)">3</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-pos">4</div>
+          <div class="lb-av" style="background:linear-gradient(135deg,#1e4020,#3a7a40)">YT</div>
+          <div><div class="lb-name">Yuki Tanaka</div><div class="lb-name-sub">Sales · 2 books</div></div>
+          <div class="lb-books">2</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-pos">5</div>
+          <div class="lb-av" style="background:linear-gradient(135deg,#3a2060,#6e45b8)">PL</div>
+          <div><div class="lb-name">Priya Lal</div><div class="lb-name-sub">Sales · 1 book</div></div>
+          <div class="lb-books">1</div>
+        </div>
+      </div>
+    </div><!-- /tab-achievements -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Sticky bar -->
+<div class="sticky-bar" id="stickyBar">
+  <div>
+    <div class="sb-sel-label">Selected for Q2 2026</div>
+    <div class="sb-sel-book" id="stickyTitle">—</div>
+    <div class="sb-sel-author" id="stickyAuthor"></div>
+  </div>
+  <div class="sb-actions">
+    <button class="btn btn-outline" onclick="clearSelection()">Cancel</button>
+    <button class="btn btn-amber" id="submitToHR">
+      Submit to HR
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="./auth.js"></script>
+<script src="./recommendations.js"></script>
+<script>
+  const memberSession = GBAuth.requireAuth();
+  if (memberSession) {
+    GBAuth.applyToDashboard(memberSession);
+    GBAuth.applyPendingOrderUI();
+  }
+
+  document.getElementById('signOutLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    GBAuth.signOut('./login.html');
+  });
+
+  // ── Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+  (function tick(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick);})();
+  document.querySelectorAll('a,button,.rec-card,.shelf-card,.review-card,.badge-card,.lb-row').forEach(el=>{
+    el.addEventListener('mouseenter',()=>cursor.classList.add('expand'));
+    el.addEventListener('mouseleave',()=>cursor.classList.remove('expand'));
+  });
+
+  // ── Tab switching
+  document.querySelectorAll('.sb-item[data-tab]').forEach(item=>{
+    item.addEventListener('click',e=>{
+      e.preventDefault();
+      GBAuth.switchDashboardTab(item.dataset.tab);
+      if (history.replaceState) history.replaceState(null, '', `#${item.dataset.tab}`);
+    });
+  });
+
+  const initialTab = (location.hash || '').replace('#', '');
+  if (initialTab && document.getElementById('tab-' + initialTab)) {
+    GBAuth.switchDashboardTab(initialTab);
+  }
+
+  // ── Ring animation on load
+  const ringFill = document.getElementById('ringFill');
+  const circ = 2*Math.PI*38;
+  ringFill.style.strokeDasharray = circ;
+  ringFill.style.strokeDashoffset = circ; // start empty
+  setTimeout(()=>{
+    if (GBAuth.getPendingOrder()) {
+      ringFill.style.strokeDashoffset = circ * 0.15;
+    } else {
+      ringFill.style.strokeDashoffset = 0;
+    }
+  }, 300);
+
+  // ── Book selection
+  let selectedBook = null;
+  let selectedBookMeta = null;
+
+  function selectBook(id, title, author, price, bookId, isbn) {
+    if (GBAuth.getPendingOrder()) return;
+
+    if (selectedBook) {
+      const prevCard = document.getElementById('rec-' + selectedBook);
+      if (prevCard) prevCard.classList.remove('selected');
+      const prevMeta = selectedBookMeta;
+      const selectedDiv = document.querySelector('#rec-' + selectedBook + ' .btn-selected');
+      const prevBtn = document.getElementById('selectBtn-' + selectedBook);
+      if (selectedDiv && prevMeta) {
+        const p = Number(prevMeta.price).toFixed(2);
+        selectedDiv.outerHTML =
+          `<button type="button" class="btn btn-amber btn-select" id="selectBtn-${selectedBook}"` +
+          ` data-id="${escAttr(prevMeta.id)}" data-title="${escAttr(prevMeta.title)}"` +
+          ` data-author="${escAttr(prevMeta.author)}" data-price="${p}"` +
+          ` data-isbn="${escAttr(prevMeta.isbn || '')}"` +
+          ` onclick="selectBook(${selectedBook}, this.dataset.title, this.dataset.author, parseFloat(this.dataset.price), this.dataset.id, this.dataset.isbn)">Select this book</button>`;
+      } else if (prevBtn && prevBtn.dataset.title) {
+        prevBtn.outerHTML =
+          `<button type="button" class="btn btn-amber btn-select" id="selectBtn-${selectedBook}"` +
+          ` data-id="${escAttr(prevBtn.dataset.id)}" data-title="${escAttr(prevBtn.dataset.title)}"` +
+          ` data-author="${escAttr(prevBtn.dataset.author)}" data-price="${prevBtn.dataset.price}"` +
+          ` data-isbn="${escAttr(prevBtn.dataset.isbn || '')}"` +
+          ` onclick="selectBook(${selectedBook}, this.dataset.title, this.dataset.author, parseFloat(this.dataset.price), this.dataset.id, this.dataset.isbn)">Select this book</button>`;
+      }
+    }
+
+    selectedBook = id;
+    selectedBookMeta = { id: bookId, title, author, price, isbn: isbn || '' };
+
+    document.getElementById('rec-' + id)?.classList.add('selected');
+    const btn = document.getElementById('selectBtn-' + id);
+    if (btn) btn.outerHTML = '<div class="btn-selected"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Selected</div>';
+
+    document.getElementById('stickyTitle').textContent = title;
+    document.getElementById('stickyAuthor').textContent = author;
+    document.getElementById('stickyBar').classList.add('show');
+  }
+
+  function escAttr(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function clearSelection() {
+    if (!selectedBook) return;
+    const id = selectedBook;
+    const meta = selectedBookMeta;
+    document.getElementById('rec-' + id)?.classList.remove('selected');
+
+    const selectedDiv = document.querySelector('#rec-' + id + ' .btn-selected');
+    if (selectedDiv && meta) {
+      const p = Number(meta.price).toFixed(2);
+      selectedDiv.outerHTML =
+        `<button type="button" class="btn btn-amber btn-select" id="selectBtn-${id}"` +
+        ` data-id="${escAttr(meta.id)}" data-title="${escAttr(meta.title)}"` +
+        ` data-author="${escAttr(meta.author)}" data-price="${p}"` +
+        ` data-isbn="${escAttr(meta.isbn || '')}"` +
+        ` onclick="selectBook(${id}, this.dataset.title, this.dataset.author, parseFloat(this.dataset.price), this.dataset.id, this.dataset.isbn)">Select this book</button>`;
+    }
+
+    selectedBook = null;
+    selectedBookMeta = null;
+    document.getElementById('stickyTitle').textContent = '—';
+    document.getElementById('stickyAuthor').textContent = '';
+    document.getElementById('stickyBar').classList.remove('show');
+  }
+
+  // ── Ripple utility
+  function rippleBtn(btn) {
+    btn.addEventListener('click', function handler(e) {
+      const r=document.createElement('span');
+      const rect=btn.getBoundingClientRect();
+      const size=Math.max(rect.width,rect.height)*1.5;
+      r.className='ripple';
+      r.style.cssText=`width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+      btn.appendChild(r);
+      setTimeout(()=>r.remove(),600);
+    },{once:false});
+  }
+  document.querySelectorAll('.btn').forEach(rippleBtn);
+
+  // ── AI recommendations
+  async function runRecommendations() {
+    if (GBAuth.getPendingOrder()) return;
+    const input = document.getElementById('aiTextarea').value.trim();
+    if (!input) {
+      document.getElementById('aiTextarea').focus();
+      return;
+    }
+    clearSelection();
+    await GBRecommend.run(input, memberSession);
+  }
+
+  document.getElementById('aiSubmitBtn').addEventListener('click', () => {
+    runRecommendations().catch(() => {});
+  });
+
+  if (!GBAuth.getPendingOrder()) {
+    runRecommendations().catch(() => {});
+  } else {
+    document.getElementById('recsList').innerHTML =
+      '<div class="rec-empty">You already submitted a book for Q2. Recommendations are locked until next quarter.</div>';
+    document.getElementById('aiSubmitBtn').disabled = true;
+    document.getElementById('aiTextarea').disabled = true;
+  }
+
+  // ── Community tab filter
+  document.querySelectorAll('.ctab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('.ctab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  // ── Submit to HR (Google Books budget validation)
+  document.getElementById('submitToHR').addEventListener('click', async function () {
+    if (!selectedBook) return;
+    const btn = this;
+    const session = GBAuth.getSession();
+    const title = document.getElementById('stickyTitle').textContent;
+    const author = document.getElementById('stickyAuthor').textContent;
+    const payload = {
+      bookId: selectedBookMeta?.id || selectedBook,
+      isbn: selectedBookMeta?.isbn || '',
+      title,
+      author,
+      price: selectedBookMeta?.price,
+      aiInput: document.getElementById('aiTextarea').value.trim(),
+      employee: session ? `${session.firstName} ${session.lastName}`.trim() : 'Employee',
+      email: session?.email || '',
+      department: session?.department || '',
+      company: session?.company || '',
+      quarter: 'Q2 2026',
+    };
+
+    btn.disabled = true;
+    const prevLabel = btn.textContent;
+    btn.textContent = 'Checking price…';
+
+    try {
+      const res = await fetch('/api/orders/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        btn.disabled = false;
+        btn.textContent = prevLabel;
+        alert(data.message || data.error || 'This book exceeds the $80 budget and cannot be ordered.');
+        return;
+      }
+
+      GBAuth.savePendingOrder(data.order || payload);
+      btn.textContent = 'Submitted!';
+      btn.style.background = 'var(--success)';
+      document.getElementById('stickyBar').classList.remove('show');
+      GBAuth.applyPendingOrderUI();
+    } catch (_err) {
+      btn.disabled = false;
+      btn.textContent = prevLabel;
+      alert('Could not validate order. Make sure the server is running (cd server && npm start).');
+    }
+  });
+
+  // spin keyframe for AI button
+  const style=document.createElement('style');
+  style.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+  document.head.appendChild(style);
+</script>
+</body>
+</html>

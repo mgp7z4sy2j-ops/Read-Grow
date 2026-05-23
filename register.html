@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — STARTRADER Reading Growth Program</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+  /* ══════════════════════════════
+     TOKENS
+  ══════════════════════════════ */
+  :root {
+    --navy:        #0F1147;
+    --navy-mid:    #161B5E;
+    --cyan:        #16E9D7;
+    --cyan-dim:    #5DD8CC;
+    --amber:       #C07328;
+    --amber-deep:  #8C4E10;
+    --amber-light: #FDF2E4;
+    --gold:        #E8A83A;
+    --paper:       #FAF7F2;
+    --paper-2:     #F3EDE4;
+    --gb-ink:      #1A130C;
+    --gb-mid:      #574739;
+    --gb-light:    #9A8A78;
+    --gb-border:   #E4D9CC;
+    --error:       #D94F4F;
+    --success:     #16A97A;
+
+    --grad-hero:   linear-gradient(135deg, #1C1860 0%, #0F1147 45%, #0A0D38 100%);
+    --grad-amber:  linear-gradient(135deg, #C07328 0%, #8C4E10 100%);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-ui:      'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+    --ease-out:    cubic-bezier(.16,1,.3,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { font-family: var(--font-ui); cursor: none; }
+  a { text-decoration: none; color: inherit; }
+  img { display: block; max-width: 100%; }
+
+  /* ── Cursor ── */
+  .cursor {
+    position: fixed; z-index: 9999; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cyan); pointer-events: none;
+    transform: translate(-50%,-50%); mix-blend-mode: difference;
+    transition: width .2s var(--ease-out), height .2s var(--ease-out);
+  }
+  .cursor.expand { width: 34px; height: 34px; background: rgba(22,233,215,.2); }
+  .cursor-ring {
+    position: fixed; z-index: 9998; width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid rgba(22,233,215,.32); pointer-events: none;
+    transform: translate(-50%,-50%);
+  }
+
+  /* ══════════════════════════════
+     LAYOUT
+  ══════════════════════════════ */
+  .auth-wrap {
+    display: grid; grid-template-columns: 42% 58%;
+    min-height: 100vh;
+  }
+
+  /* ══════════════════════════════
+     LEFT PANEL (same as login)
+  ══════════════════════════════ */
+  .panel-left {
+    position: sticky; top: 0; height: 100vh;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 85% 75% at 25% 45%, #242090 0%, transparent 55%),
+      radial-gradient(ellipse 65% 65% at 75% 65%, #0A2B70 0%, transparent 60%),
+      var(--grad-hero);
+    display: flex; flex-direction: column;
+    padding: 44px 48px 44px;
+  }
+  .pl-glow-a {
+    position: absolute; top: -8%; left: -12%;
+    width: 560px; height: 560px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,115,40,.2) 0%, transparent 60%);
+    pointer-events: none; animation: driftA 18s ease-in-out infinite;
+  }
+  .pl-glow-b {
+    position: absolute; bottom: 0; right: -8%;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(22,233,215,.1) 0%, transparent 58%);
+    pointer-events: none; animation: driftB 14s ease-in-out infinite;
+  }
+  .pl-grain {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 180px; opacity: .55; pointer-events: none;
+  }
+  .pl-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(218,227,237,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(218,227,237,.025) 1px, transparent 1px);
+    background-size: 52px 52px; pointer-events: none;
+  }
+  @keyframes driftA { 0%,100%{transform:translate(0,0)} 50%{transform:translate(24px,-16px)} }
+  @keyframes driftB { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-16px,12px)} }
+
+  .pl-logo { position: relative; z-index: 2; }
+  .pl-logo img { height: 44px; width: auto; }
+  .pl-logo-back {
+    display: inline-flex; align-items: center; gap: 7px; margin-top: 10px;
+    font-family: var(--font-ui); font-size: 12px; color: rgba(218,227,237,.4);
+    transition: color .2s;
+  }
+  .pl-logo-back:hover { color: rgba(218,227,237,.7); }
+  .pl-logo-back svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .pl-copy {
+    position: relative; z-index: 2;
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: 32px 0 24px;
+  }
+  .pl-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 13px 5px 9px;
+    background: rgba(22,233,215,.07); border: 1px solid rgba(22,233,215,.16);
+    border-radius: 99px; margin-bottom: 28px;
+    font-family: var(--font-ui); font-size: 11px; font-weight: 500; color: var(--cyan); letter-spacing: .06em;
+  }
+  .pl-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 7px var(--cyan); animation: pulse 2.4s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+
+  .pl-title {
+    font-family: var(--font-display); font-size: clamp(44px, 4.2vw, 62px); font-weight: 700;
+    line-height: 1.02; color: #fff; margin-bottom: 20px;
+  }
+  .pl-title em { color: var(--gold); font-style: italic; display: block; }
+  .pl-sub {
+    font-family: var(--font-body); font-size: 15px; font-weight: 300; line-height: 1.75;
+    color: rgba(218,227,237,.62); max-width: 320px;
+  }
+
+  /* Steps preview */
+  .pl-steps {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;
+  }
+  .pl-step {
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(14,16,34,.55);
+    border: 1px solid rgba(218,227,237,.08); border-radius: 12px;
+    padding: 13px 16px;
+    backdrop-filter: blur(16px);
+    transition: border-color .25s, background .25s;
+    animation: fadeInLeft .6s var(--ease-out) forwards; opacity: 0;
+  }
+  .pl-step:nth-child(1) { animation-delay: .3s; }
+  .pl-step:nth-child(2) { animation-delay: .44s; }
+  .pl-step:nth-child(3) { animation-delay: .58s; }
+  @keyframes fadeInLeft { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:translateX(0)} }
+
+  .pl-step-num {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(22,233,215,.1); border: 1px solid rgba(22,233,215,.22);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-ui); font-size: 11px; font-weight: 700; color: var(--cyan);
+  }
+  .pl-step-text { font-family: var(--font-ui); font-size: 13px; color: rgba(218,227,237,.7); }
+  .pl-step-text strong { color: #fff; display: block; font-size: 13.5px; }
+
+  .pl-tagline {
+    position: relative; z-index: 2;
+    font-family: var(--font-display); font-style: italic; font-size: 13px;
+    color: rgba(218,227,237,.2);
+  }
+
+  /* ══════════════════════════════
+     RIGHT PANEL
+  ══════════════════════════════ */
+  .panel-right {
+    background: var(--paper);
+    display: flex; flex-direction: column;
+  }
+  .pr-inner {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center;
+    padding: 60px 48px 80px;
+  }
+  .pr-form-wrap { width: 100%; max-width: 440px; }
+
+  /* Breadcrumb */
+  .pr-breadcrumb {
+    font-family: var(--font-ui); font-size: 12px; color: var(--gb-light);
+    margin-bottom: 36px; display: flex; align-items: center; gap: 8px;
+  }
+  .pr-breadcrumb a { color: var(--amber); transition: color .15s; }
+  .pr-breadcrumb a:hover { color: var(--amber-deep); }
+  .pr-breadcrumb-sep { color: var(--gb-border); }
+
+  .pr-title {
+    font-family: var(--font-display); font-size: 36px; font-weight: 700;
+    color: var(--gb-ink); line-height: 1.1; margin-bottom: 8px;
+  }
+  .pr-sub {
+    font-family: var(--font-body); font-size: 14.5px; font-weight: 300;
+    color: var(--gb-light); margin-bottom: 36px; line-height: 1.6;
+  }
+
+  /* Two-column row */
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* Fields */
+  .field { margin-bottom: 18px; }
+  .field-label {
+    display: block; margin-bottom: 7px;
+    font-family: var(--font-ui); font-size: 13px; font-weight: 600;
+    color: var(--gb-mid); letter-spacing: .02em;
+  }
+  .field-hint {
+    font-family: var(--font-ui); font-size: 11.5px; color: var(--gb-light);
+    margin-top: 5px;
+  }
+  .field-input-wrap { position: relative; }
+  .field-input {
+    width: 100%; padding: 13px 16px;
+    background: #fff; color: var(--gb-ink);
+    border: 1.5px solid var(--gb-border);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    font-family: var(--font-ui); font-size: 15px;
+    transition: border-color .2s, box-shadow .2s, border-left-color .2s;
+    outline: none; -webkit-appearance: none;
+  }
+  .field-input::placeholder { color: var(--gb-light); }
+  .field-input:focus {
+    border-color: rgba(192,115,40,.4);
+    border-left-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(192,115,40,.08);
+  }
+  .field-input.has-value { border-left-color: var(--cyan-dim); }
+  .field-input.error {
+    border-color: rgba(217,79,79,.3);
+    border-left-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(217,79,79,.08);
+  }
+  .field-input.valid { border-left-color: var(--success); }
+
+  /* Select */
+  .field-select {
+    width: 100%; padding: 13px 40px 13px 16px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%239A8A78' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+    color: var(--gb-ink);
+    border: 1.5px solid var(--gb-border);
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    font-family: var(--font-ui); font-size: 15px;
+    transition: border-color .2s, box-shadow .2s, border-left-color .2s;
+    outline: none; -webkit-appearance: none; appearance: none;
+    cursor: none;
+  }
+  .field-select:focus {
+    border-color: rgba(192,115,40,.4);
+    border-left-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(192,115,40,.08);
+  }
+  .field-select.has-value { border-left-color: var(--cyan-dim); }
+
+  /* Password toggle */
+  .field-input.has-toggle { padding-right: 44px; }
+  .toggle-btn {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: none; padding: 4px;
+    color: var(--gb-light); transition: color .2s;
+    display: flex; align-items: center;
+  }
+  .toggle-btn:hover { color: var(--gb-mid); }
+  .toggle-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+
+  /* Confirm match indicator */
+  .match-icon {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px; display: none; align-items: center; justify-content: center;
+  }
+  .match-icon svg { width: 16px; height: 16px; stroke-width: 2.5; fill: none; }
+  .match-icon.ok svg { stroke: var(--success); }
+  .match-icon.no svg { stroke: var(--error); }
+  .match-icon.ok, .match-icon.no { display: flex; }
+
+  /* Password strength meter */
+  .strength-wrap { margin-top: 8px; }
+  .strength-bars {
+    display: flex; gap: 4px; margin-bottom: 5px;
+  }
+  .strength-bar {
+    flex: 1; height: 3px; border-radius: 99px;
+    background: var(--gb-border); transition: background .3s;
+  }
+  .strength-label {
+    font-family: var(--font-ui); font-size: 11.5px; color: var(--gb-light);
+    transition: color .3s;
+  }
+
+  /* Inline error */
+  .field-error {
+    font-family: var(--font-ui); font-size: 12px; color: var(--error);
+    margin-top: 5px; overflow: hidden; max-height: 0;
+    transition: max-height .25s var(--ease-out), opacity .25s;
+    opacity: 0; padding-left: 2px;
+  }
+  .field-error.show { max-height: 24px; opacity: 1; }
+
+  /* Checkbox */
+  .check-label {
+    display: flex; align-items: flex-start; gap: 10px; cursor: none;
+    font-family: var(--font-ui); font-size: 13.5px; color: var(--gb-mid);
+    user-select: none; margin-bottom: 24px;
+  }
+  .check-box {
+    width: 18px; height: 18px; border-radius: 5px; margin-top: 1px;
+    border: 1.5px solid var(--gb-border); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: border-color .2s, background .2s;
+  }
+  .check-box svg { width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2.5; opacity: 0; transition: opacity .15s; }
+  .check-label input { display: none; }
+  .check-label input:checked + .check-box { background: var(--amber); border-color: var(--amber); }
+  .check-label input:checked + .check-box svg { opacity: 1; }
+  .check-label a { color: var(--amber); }
+
+  /* Submit */
+  .btn-submit {
+    width: 100%; padding: 15px 24px;
+    background: var(--grad-amber); color: #fff;
+    border: none; border-radius: 10px;
+    font-family: var(--font-ui); font-size: 15px; font-weight: 600;
+    cursor: none; position: relative; overflow: hidden;
+    transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out), opacity .2s;
+    box-shadow: 0 4px 16px rgba(192,115,40,.25);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 24px;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(192,115,40,.36); }
+  .btn-submit:active { transform: scale(.97); }
+  .btn-submit::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+    transform: skewX(-15deg);
+    transition: left .55s var(--ease-out);
+  }
+  .btn-submit:hover::after { left: 150%; }
+  .btn-submit:disabled { opacity: .65; transform: none; }
+  .btn-submit .spin {
+    width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.35);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin .7s linear infinite; display: none;
+  }
+  .btn-submit.loading .btn-text { display: none; }
+  .btn-submit.loading .spin { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ripple {
+    position: absolute; border-radius: 50%; transform: scale(0);
+    background: rgba(255,255,255,.25); animation: rippleOut .55s var(--ease-out) forwards;
+    pointer-events: none;
+  }
+  @keyframes rippleOut { to { transform: scale(4); opacity: 0; } }
+
+  /* Switch */
+  .form-switch {
+    text-align: center;
+    font-family: var(--font-ui); font-size: 14px; color: var(--gb-mid);
+  }
+  .form-switch a { color: var(--amber); font-weight: 600; margin-left: 4px; transition: color .15s; }
+  .form-switch a:hover { color: var(--amber-deep); }
+
+  /* Section separator */
+  .form-section-label {
+    font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .14em;
+    color: var(--gb-light); margin: 6px 0 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .form-section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--gb-border);
+  }
+
+  /* Stagger enter */
+  .pr-form-wrap > * {
+    opacity: 0; transform: translateY(16px);
+    animation: fadeUp .6s var(--ease-out) forwards;
+  }
+  .pr-breadcrumb { animation-delay: .08s; }
+  .pr-title      { animation-delay: .14s; }
+  .pr-sub        { animation-delay: .20s; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+    .auth-wrap { grid-template-columns: 1fr; }
+    .panel-left { display: none; }
+    .pr-inner { align-items: flex-start; padding-top: 48px; }
+    .pr-form-wrap::before {
+      content: '';
+      display: block;
+      height: 44px; width: 180px;
+      background: url('./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_RGB.png') left center / contain no-repeat;
+      margin-bottom: 32px;
+    }
+  }
+  @media (max-width: 640px) {
+    .pr-inner { padding: 40px 24px 60px; }
+    .field-row { grid-template-columns: 1fr; }
+  }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+<div class="auth-wrap">
+
+  <!-- ══ LEFT PANEL ══ -->
+  <div class="panel-left" aria-hidden="true">
+    <div class="pl-glow-a"></div>
+    <div class="pl-glow-b"></div>
+    <div class="pl-grain"></div>
+    <div class="pl-grid"></div>
+
+    <div class="pl-logo">
+      <img src="./STARTRADER LOGO/WEB/STARTRADER_Primary_Logo_Inverted_RGB.png" alt="STARTRADER" height="44">
+      <a href="./index.html" class="pl-logo-back">
+        <svg viewBox="0 0 12 12"><path d="M8 2L4 6l4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back to home
+      </a>
+    </div>
+
+    <div class="pl-copy">
+      <div class="pl-pill">
+        <span class="pl-pill-dot"></span>
+        Q2 2026 · Now open
+      </div>
+      <h1 class="pl-title">
+        Join the
+        <em>program.</em>
+      </h1>
+      <p class="pl-sub">One book. One quarter. Your company covers the cost — you just read and grow.</p>
+    </div>
+
+    <div class="pl-steps">
+      <div class="pl-step">
+        <div class="pl-step-num">01</div>
+        <div class="pl-step-text">
+          <strong>Describe your challenge</strong>
+          Tell our AI what skill you want to build
+        </div>
+      </div>
+      <div class="pl-step">
+        <div class="pl-step-num">02</div>
+        <div class="pl-step-text">
+          <strong>Get 5 AI recommendations</strong>
+          Ranked by relevance to your situation
+        </div>
+      </div>
+      <div class="pl-step">
+        <div class="pl-step-num">03</div>
+        <div class="pl-step-text">
+          <strong>Receive your book</strong>
+          HR ships it in STARTRADER packaging
+        </div>
+      </div>
+    </div>
+
+    <p class="pl-tagline">One Book. One Quarter. One Step Forward.</p>
+  </div>
+
+  <!-- ══ RIGHT PANEL ══ -->
+  <div class="panel-right">
+    <div class="pr-inner">
+      <div class="pr-form-wrap">
+
+        <div class="pr-breadcrumb">
+          <a href="./index.html">STARTRADER Reading Growth Program</a>
+          <span class="pr-breadcrumb-sep">/</span>
+          Create account
+        </div>
+
+        <h1 class="pr-title">Create your account</h1>
+        <p class="pr-sub">STARTRADER &amp; StarPrime employees only. Verified by email domain.</p>
+
+        <form id="registerForm" novalidate>
+
+          <p class="form-section-label">Personal info</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="firstName">First Name</label>
+              <input class="field-input" id="firstName" name="firstName" type="text" autocomplete="given-name" placeholder="First">
+              <p class="field-error" id="firstName-error">Required.</p>
+            </div>
+            <div class="field">
+              <label class="field-label" for="lastName">Last Name</label>
+              <input class="field-input" id="lastName" name="lastName" type="text" autocomplete="family-name" placeholder="Last">
+              <p class="field-error" id="lastName-error">Required.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="email">Work Email</label>
+            <div class="field-input-wrap">
+              <input class="field-input" id="email" name="email" type="email" autocomplete="email" placeholder="you@startrader.com">
+            </div>
+            <p class="field-hint">Must be @startrader.com or @starprime.com</p>
+            <p class="field-error" id="email-error">Please use your company email address.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="department">Department</label>
+            <select class="field-select" id="department" name="department">
+              <option value="" disabled selected>Select your department</option>
+              <option value="sales">Sales</option>
+              <option value="technology">Technology</option>
+              <option value="product">Product</option>
+              <option value="operations">Operations</option>
+              <option value="marketing">Marketing</option>
+              <option value="finance">Finance</option>
+              <option value="hr">HR &amp; People</option>
+              <option value="legal">Legal &amp; Compliance</option>
+              <option value="executive">Executive</option>
+              <option value="other">Other</option>
+            </select>
+            <p class="field-error" id="dept-error">Please select your department.</p>
+          </div>
+
+          <p class="form-section-label">Security</p>
+
+          <div class="field">
+            <label class="field-label" for="password">Password</label>
+            <div class="field-input-wrap">
+              <input class="field-input has-toggle" id="password" name="password" type="password" autocomplete="new-password" placeholder="Create a password">
+              <button type="button" class="toggle-btn" id="togglePwd" aria-label="Show password">
+                <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="strength-wrap">
+              <div class="strength-bars">
+                <div class="strength-bar" id="s1"></div>
+                <div class="strength-bar" id="s2"></div>
+                <div class="strength-bar" id="s3"></div>
+                <div class="strength-bar" id="s4"></div>
+              </div>
+              <span class="strength-label" id="strengthLabel">Enter a password</span>
+            </div>
+            <p class="field-error" id="pwd-error">Password must be at least 6 characters.</p>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="confirm">Confirm Password</label>
+            <div class="field-input-wrap">
+              <input class="field-input has-toggle" id="confirm" name="confirm" type="password" autocomplete="new-password" placeholder="Repeat your password">
+              <span class="match-icon" id="matchIcon">
+                <svg id="matchSvg" viewBox="0 0 24 24"></svg>
+              </span>
+            </div>
+            <p class="field-error" id="confirm-error">Passwords do not match.</p>
+          </div>
+
+          <label class="check-label">
+            <input type="checkbox" name="terms" id="terms">
+            <span class="check-box">
+              <svg viewBox="0 0 10 10"><polyline points="1.5 5 4 7.5 8.5 2.5"/></svg>
+            </span>
+            I agree to the <a href="#">program terms</a> and company reading policy.
+          </label>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span class="btn-text">Create account</span>
+            <span class="spin"></span>
+          </button>
+
+        </form>
+
+        <p class="form-switch">
+          Already have an account?
+          <a href="./login.html">Sign in →</a>
+        </p>
+        <p class="form-switch" style="margin-top:8px;font-size:12px">
+          HR administrator?
+          <a href="./admin-login.html">Admin portal →</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="./auth.js"></script>
+<script>
+  GBAuth.redirectIfAuthed();
+  // ── Cursor
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+  });
+  (function tick() { rx += (mx-rx)*.12; ry += (my-ry)*.12; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(tick); })();
+  document.querySelectorAll('a, button, .check-label, select').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('expand'));
+  });
+
+  // ── Input state helpers
+  function setState(inp, state) {
+    inp.classList.remove('has-value', 'error', 'valid');
+    if (state) inp.classList.add(state);
+  }
+  document.querySelectorAll('.field-input').forEach(inp => {
+    inp.addEventListener('input', () => setState(inp, inp.value ? 'has-value' : ''));
+  });
+
+  // ── Select state
+  const deptSel = document.getElementById('department');
+  deptSel.addEventListener('change', () => {
+    deptSel.classList.add('has-value');
+    document.getElementById('dept-error').classList.remove('show');
+  });
+
+  // ── Email domain check
+  const emailInp  = document.getElementById('email');
+  const emailErr  = document.getElementById('email-error');
+  const validDomains = GBAuth.VALID_DOMAINS;
+  emailInp.addEventListener('blur', () => {
+    if (!emailInp.value) return;
+    const domain = (emailInp.value.split('@')[1] || '').toLowerCase();
+    if (!validDomains.includes(domain)) {
+      setState(emailInp, 'error');
+      emailErr.classList.add('show');
+    } else {
+      setState(emailInp, 'valid');
+      emailErr.classList.remove('show');
+    }
+  });
+  emailInp.addEventListener('focus', () => emailErr.classList.remove('show'));
+
+  // ── Password toggle (shared for both)
+  function makeToggle(btnId, inputId, iconId) {
+    const btn = document.getElementById(btnId);
+    const inp = document.getElementById(inputId);
+    const ico = document.getElementById(iconId);
+    const eyeOpen = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    const eyeOff  = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+    let vis = false;
+    btn.addEventListener('click', () => {
+      vis = !vis;
+      inp.type = vis ? 'text' : 'password';
+      ico.innerHTML = vis ? eyeOff : eyeOpen;
+    });
+  }
+  makeToggle('togglePwd', 'password', 'eyeIcon');
+
+  // ── Password strength
+  const pwdInp = document.getElementById('password');
+  const bars   = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3'), document.getElementById('s4')];
+  const strLabel = document.getElementById('strengthLabel');
+  const levels = [
+    { label: 'Too short',   color: '#D94F4F', bars: 1 },
+    { label: 'Weak',        color: '#E87028', bars: 1 },
+    { label: 'Fair',        color: '#E8A83A', bars: 2 },
+    { label: 'Good',        color: '#C07328', bars: 3 },
+    { label: 'Strong',      color: '#16E9D7', bars: 4 },
+  ];
+
+  function getStrength(v) {
+    if (!v) return -1;
+    if (v.length < 6) return 0;
+    let score = 1;
+    if (v.length >= 6) score = 1;
+    if (v.length >= 8) score = 2;
+    if (v.length >= 8 && (/[A-Z]/.test(v) || /[0-9]/.test(v))) score = 3;
+    if (v.length >= 8 && /[A-Z]/.test(v) && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v)) score = 4;
+    return score;
+  }
+
+  pwdInp.addEventListener('input', () => {
+    const s = getStrength(pwdInp.value);
+    if (s < 0) {
+      bars.forEach(b => b.style.background = '');
+      strLabel.textContent = 'Enter a password'; strLabel.style.color = '';
+      return;
+    }
+    const lvl = levels[s];
+    bars.forEach((b, i) => {
+      b.style.background = i < lvl.bars ? lvl.color : 'var(--gb-border)';
+    });
+    strLabel.textContent = lvl.label; strLabel.style.color = lvl.color;
+    // clear error if length ok
+    if (pwdInp.value.length >= 6) document.getElementById('pwd-error').classList.remove('show');
+  });
+
+  // ── Confirm match
+  const confirmInp  = document.getElementById('confirm');
+  const matchIcon   = document.getElementById('matchIcon');
+  const matchSvg    = document.getElementById('matchSvg');
+  const checkMark   = `<polyline points="4 7 8 11 13 4"/>`;
+  const crossMark   = `<line x1="5" y1="5" x2="13" y2="13"/><line x1="13" y1="5" x2="5" y2="13"/>`;
+
+  confirmInp.addEventListener('input', () => {
+    if (!confirmInp.value) {
+      matchIcon.className = 'match-icon'; return;
+    }
+    if (confirmInp.value === pwdInp.value) {
+      matchIcon.className = 'match-icon ok';
+      matchSvg.innerHTML = checkMark;
+      setState(confirmInp, 'valid');
+      document.getElementById('confirm-error').classList.remove('show');
+    } else {
+      matchIcon.className = 'match-icon no';
+      matchSvg.innerHTML = crossMark;
+      setState(confirmInp, 'error');
+    }
+  });
+
+  // ── Checkbox click
+  document.querySelectorAll('.check-label').forEach(lbl => {
+    lbl.addEventListener('click', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'A') return;
+      const inp = lbl.querySelector('input');
+      inp.checked = !inp.checked;
+    });
+  });
+
+  // ── Ripple
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.addEventListener('click', e => {
+    const r = document.createElement('span');
+    const rect = submitBtn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 1.5;
+    r.className = 'ripple';
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    submitBtn.appendChild(r);
+    setTimeout(() => r.remove(), 600);
+  });
+
+  // ── Submit validation
+  document.getElementById('registerForm').addEventListener('submit', e => {
+    e.preventDefault();
+    let valid = true;
+
+    const required = [
+      { id: 'firstName', errId: 'firstName-error', msg: 'Required.' },
+      { id: 'lastName',  errId: 'lastName-error',  msg: 'Required.' },
+    ];
+    required.forEach(({ id, errId }) => {
+      const inp = document.getElementById(id);
+      const err = document.getElementById(errId);
+      if (!inp.value.trim()) { setState(inp, 'error'); err.classList.add('show'); valid = false; }
+      else { err.classList.remove('show'); }
+    });
+
+    // Email
+    const emailDomain = (emailInp.value.split('@')[1] || '').toLowerCase();
+    if (!emailInp.value || !validDomains.includes(emailDomain)) {
+      setState(emailInp, 'error'); emailErr.classList.add('show'); valid = false;
+    }
+
+    // Department
+    if (!deptSel.value) {
+      document.getElementById('dept-error').classList.add('show'); valid = false;
+    }
+
+    // Password
+    if (!pwdInp.value || pwdInp.value.length < 6) {
+      setState(pwdInp, 'error'); document.getElementById('pwd-error').classList.add('show'); valid = false;
+    }
+
+    // Confirm
+    if (confirmInp.value !== pwdInp.value) {
+      setState(confirmInp, 'error'); document.getElementById('confirm-error').classList.add('show'); valid = false;
+    }
+
+    // Terms
+    if (!document.getElementById('terms').checked) { valid = false; }
+
+    if (!valid) return;
+
+    submitBtn.classList.add('loading'); submitBtn.disabled = true;
+    setTimeout(() => {
+      const user = GBAuth.buildUserFromRegister({
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: emailInp.value,
+        department: deptSel.value,
+      });
+      GBAuth.saveSession(user);
+      window.location.href = './dashboard.html';
+    }, 900);
+  });
+</script>
+</body>
+</html>
