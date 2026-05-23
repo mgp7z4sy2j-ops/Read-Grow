@@ -733,13 +733,6 @@
   });
 
   // ── Checkbox click
-  document.querySelectorAll('.check-label').forEach(lbl => {
-    lbl.addEventListener('click', e => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'A') return;
-      const inp = lbl.querySelector('input');
-      inp.checked = !inp.checked;
-    });
-  });
 
   // ── Ripple
   const submitBtn = document.getElementById('submitBtn');
